@@ -1,0 +1,16 @@
+{
+  "name": "fancy-components-js",
+  "version": "1.0.0",
+  "description": "A library to easily create cool html components",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luan Peixoto",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}
