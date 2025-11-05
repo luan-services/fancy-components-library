@@ -33,6 +33,18 @@ Isso usa o tsup para:
 
 Sempre rode o build após alterar algo em src/.
 
+# Build automático (modo watch)
+
+Para não precisar rodar build a cada alteração:
+
+```bash
+npm run build:watch
+```
+
+Isso recompila instantaneamente sempre que você alterar qualquer arquivo em src/.
+
+* Esse comando deve ficar rodando em um terminal separado.
+
 # Rodando servidor de testes
 
 O navegador não permite imports ES modules via file://, então precisamos de um servidor local.
@@ -40,9 +52,7 @@ O navegador não permite imports ES modules via file://, então precisamos de um
 Execute:
 
 ```bash
-npx serve .
+npm run dev
 ```
 
-Em seguida, abra no navegador:
-
-http://localhost:3000/tests/test.html
+O Vite vai subir um servidor local que recarrega o navegador automaticamente à cada mudança (build:watch precisa estar ativo).
