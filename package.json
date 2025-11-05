@@ -6,15 +6,20 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts"
+    "dev": "vite",
+    "build": "tsup src/index.ts --format esm --dts",
+    "build:watch": "tsup src/index.ts --format esm --dts --watch"
   },
   "author": "Luan Peixoto",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^24.10.0",
     "tsup": "^8.5.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^7.2.0"
   }
 }
