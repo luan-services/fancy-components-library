@@ -1,13 +1,14 @@
-// re-exporta as funções individuais de componentes
-export { defineAutoComplete } from "./components/auto-complete/index";
-export { defineButton } from "./components/button/index";
+/*  this index.ts will be the main source for the components, it must import each define method from each individual
+component folder (index.ts), and re-exports it
 
-// importa as funções p gerar o defineAll()
+it also creates a defineAll(); function, which lets the user define all components at once */
+
 import { defineAutoComplete } from "./components/auto-complete/index";
 import { defineButton } from "./components/button/index";
 
-// cria a função que exporta todos os componentes
-export function defineAll() {
+export { defineAutoComplete, defineButton }
+
+export const defineAll = () => {
     defineAutoComplete();
     defineButton();
 }

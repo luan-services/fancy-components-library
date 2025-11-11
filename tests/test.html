@@ -3,17 +3,24 @@
 	<head>
 		<meta charset="UTF-8" />
 		<title>Teste Components</title>
+		<link rel="stylesheet" type="text/css" href="test.css">
 	</head>
 	<body>
-		<h1>Testando Components</h1>
+		<h1>Testing Sheet</h1>
 
-		<auto-complete></auto-complete>
-		<my-button></my-button>
+		<div class="container">
+            <auto-complete></auto-complete>
+		</div>
 
-		<script type="module">
-			import { defineAll } from "../dist/index.js";
+		<div class="container">
+			<fancy-button></fancy-button>
+		</div>
 
-			defineAll();
-		</script>
+	<script type="module">
+        import { defineAll } from '../src/index.ts';
+        
+        defineAll();
+
+    </script>
 	</body>
 </html>
