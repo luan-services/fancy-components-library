@@ -5,7 +5,7 @@ export class FcOption extends HTMLElement {
 	/* this is a static method that tells the browser which atributes should be 'watched', that means
 	whenever 'value' or 'selected' changes, 'attributeChangedCallback' will be called. */
 	static get observedAttributes() { 
-		return ['value', 'selected'];
+		return ['value', 'label', 'selected'];
 	}
 
 	/* this is the class constructor, whenever you create a new element on js or at the dom, this will be called */
@@ -22,7 +22,7 @@ export class FcOption extends HTMLElement {
 			const component = _select the component here_ 
 			component.value = 'something'
 		or
-			<fc-option value="somethin"></fc-option>
+			<fc-option value="somethin">text_label</fc-option>
 
 		this is just an example, the attributes here mostly won't be used by the final user, the main ideia is to let
 		the parent decides when an option will be selected or not.
@@ -35,6 +35,15 @@ export class FcOption extends HTMLElement {
 
 	public set value(data: string) { 
 		this.setAttribute('value', data);
+	}
+
+	get label() { // label is the inner text that are shown on the option element, 'value' is the hidden value
+		return this.getAttribute('label') ?? this.textContent ?? '';
+	}
+
+	set label(val: string) {
+		this.setAttribute('label', val);
+		this.textContent = val; // update the innertext of the option element
 	}
 
 	public get selected() { // return true if the component has 'selected' attribute
@@ -53,7 +62,7 @@ export class FcOption extends HTMLElement {
 		this.updateSelection(); // also updates aria-selected label
 	}
 
-	/* this is the function that runs whenever an observed attribute is changed, note: this is called 
+	/* this is the function that runs whenever an observed attribute is changed , note: this is called 
 	by the browser itself, so you need to accept all these three props even if you will not be using it
 	_ on it are for TypeScript to prevent the 'never used warning' */
 
@@ -82,7 +91,10 @@ export class FcOption extends HTMLElement {
 			
 			this.dispatchEvent(new CustomEvent('fc-option-select', 
 				{
-					detail: { value: this.value },
+					detail: { 
+						value: this.value, 
+						label: this.label 
+					},
 					bubbles: true, // bubbles lets this event goes up to its father (needs composed)
 					composed: true // composed lets this event cross the shadow DOM
 				}

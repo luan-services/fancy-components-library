@@ -12,18 +12,14 @@
 
 
             <fc-autocomplete placeholder="Countrys">
-                <fc-option value="france">France</fc-option>
-                <fc-option value="japan">Japan</fc-option>
-                <fc-option value="brazil">Brazil</fc-option>
+                <fc-option value="country-1">France</fc-option>
+                <fc-option value="country-2">Japan</fc-option>
+                <fc-option value="country-3">Brazil</fc-option>
             </fc-autocomplete>
             
             <fc-autocomplete id="ac-fruits"> 
             </fc-autocomplete>
 
-		</div>
-
-		<div class="container">
-			<fancy-button></fancy-button>
 		</div>
 
 	<script type="module">
@@ -33,9 +29,9 @@
         defineAll();
 
         const acOptions = [
-            { label: 'Apple', value: '1' },
-            { label: 'Orange', value: '2' },
-            { label: 'Banana', value: '3' }
+            { label: 'Apple', value: 'fruit-1' },
+            { label: 'Orange', value: 'fruit-2' },
+            { label: 'Banana', value: 'fruit-3' }
         ];
 
         // setting properties for fc-autocomplete via JS (with shadow DOM, not SEO friendly)
@@ -46,15 +42,7 @@
             // acFruits.options = acOptions
             acFruits.setProps({
                 options: acOptions,
-                placeholder: 'Busque uma fruta...',
-                validator: (value) => {
-                    // value é o valor selecionado (ex: '2')
-                    if (value === '3') {
-                        return 'Você não pode selecionar "admin".';
-                    }
-                    // Retorne null se for válido
-                    return null;
-                }
+                placeholder: 'Busque uma fruta...'
             });
 
             
