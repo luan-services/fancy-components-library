@@ -116,7 +116,7 @@ export class FcAutoComplete extends HTMLElement {
 		// get all elements inside the slot and filter only elements named <fc-option>
 		const optionElements = slot!.assignedElements().filter(
 			(el) => {
-				return el.tagName === 'fc-option'
+				return el.tagName === 'FC-OPTION' // the element tag name must be upper-case
 			}
 		);
 
@@ -200,39 +200,27 @@ export class FcAutoComplete extends HTMLElement {
 	}
 
 	
-	// setProps function that lets the user updates any props via setProps({value: 'x'})
-	ssetProps(props: Record<string, any>) {
-		Object.entries(props).forEach(([key, val]) => {
-			if (key in this) {
-				(this as any)[key] = val;
-				return;
-			}
-			this.setAttribute(key, val);
-		});
-	}
-
 	setProps(props: Record<string, any>) { // props type defines an array with {string : anytype }
 		
-	
-    for (const property in props) { // for each key in props
+		for (const property in props) { // for each key in props
 
-		const value = props[property] // gets its value
-        
-        
-		// this block checks whether there is a getter, setter or private, variable for the property we are passing
-        if (property in this) {
-			// if so, call it and go to the next for iterator, ex: if the setter for 'options', this block calls it and append value to it
-            (this as any)[property] = value;
-            continue; 
-        }
+			const value = props[property] // gets its value
+			
+			
+			// this block checks whether there is a getter, setter or private, variable for the property we are passing
+			if (property in this) {
+				// if so, call it and go to the next for iterator, ex: if the setter for 'options', this block calls it and append value to it
+				(this as any)[property] = value;
+				continue; 
+			}
 
-        /* this is another check, if we are here, our class does not have logic for the current property we are reading,
-    	we will paste it directly on the HTML tag, but only if it's text/number, we skip it if it is an Objects or Arrays,
-		because it does not work properly in the html tag */
-        if (['string', 'number', 'boolean'].includes(typeof property)) {
-            this.setAttribute(property, String(value)); // if so, paste it as an HTML attribute
-        }
-    }
-}
+			/* this is another check, if we are here, our class does not have logic for the current property we are reading,
+			we will paste it directly on the HTML tag, but only if it's text/number, we skip it if it is an Objects or Arrays,
+			because it does not work properly in the html tag */
+			if (['string', 'number', 'boolean'].includes(typeof property)) {
+				this.setAttribute(property, String(value)); // if so, paste it as an HTML attribute
+			}
+		}
+	}
 }
 
