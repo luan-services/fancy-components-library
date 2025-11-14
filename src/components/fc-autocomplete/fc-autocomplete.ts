@@ -119,7 +119,6 @@ export class FcAutoComplete extends HTMLElement {
 		*/
 		this.addEventListener('fc-option-select', this.onOptionSelect.bind(this) as EventListener);
 
-
 		/* this listener is for when the user clicks outside the input so the dropdown can close this is a DOM event 
 		listener, so it must be cleaned onDisconnectCallback (when the element is removed from the dom) to prevent memory leak */
 		document.addEventListener('click', this.handleOutsideClick.bind(this) as EventListener);
@@ -154,7 +153,6 @@ export class FcAutoComplete extends HTMLElement {
 
 	disconnectedCallback() {
 		document.removeEventListener('click', this.handleOutsideClick);
-		this.removeEventListener('focusout', this.handleFocusOut);
 	}
 	/** helper functions for the eventListeners */
 
