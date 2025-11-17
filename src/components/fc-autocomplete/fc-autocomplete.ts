@@ -225,10 +225,49 @@ export class FcAutoComplete extends HTMLElement {
 	private toggleDropdown(show: boolean) {
 		if (!this.dropdownEl) {
 			return;
+		};
+
+		const dropdown = this.dropdownEl;
+
+		// if it should be open
+		if (show) {
+			dropdown.hidden = false;
+
+			// quickly unhide children so scrollHeight is correct
+			dropdown.style.height = "auto";
+			const fullHeight = dropdown.scrollHeight + "px";
+			dropdown.style.height = "0px"; // hide again
+
+			// write CSS var
+			dropdown.style.setProperty("--fc-height", fullHeight);
+
+			requestAnimationFrame(() => {
+				dropdown.dataset.state = "open";
+			});
+
+			this.inputEl.setAttribute("aria-expanded", "true");
+			return;
 		}
-		this.dropdownEl.hidden = !show;
-		this.inputEl.setAttribute('aria-expanded', show ? 'true' : 'false');
+
+		// if it should close
+		const fullHeight = dropdown.scrollHeight + "px";
+		dropdown.style.setProperty("--fc-height", fullHeight);
+
+		dropdown.dataset.state = "closing";
+		this.inputEl.setAttribute("aria-expanded", "false");
+
+		const onEnd = () => {
+			if (dropdown.dataset.state === "closing") {
+				dropdown.hidden = true;
+				dropdown.style.height = "0px";
+				dropdown.dataset.state = "";
+			}
+			dropdown.removeEventListener("animationend", onEnd);
+		};
+		
+		dropdown.addEventListener("animationend", onEnd);
 	}
+
 
 	
 	setProps(props: Record<string, any>) { // props type defines an array with {string : anytype }

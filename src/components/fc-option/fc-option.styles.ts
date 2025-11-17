@@ -14,7 +14,7 @@ export const styles = `
 		border: none;
 		font: inherit;
 		cursor: pointer;
-		transition: background .15s ease, color .15s ease;
+		transition: background 0.15s ease-in-out, color 0.15s ease-in-out;
 	}
 
 	button.fc-option:hover {

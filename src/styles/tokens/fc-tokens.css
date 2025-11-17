@@ -8,8 +8,9 @@
     --fc-autocomplete-border: var(--fc-gray-300);
     --fc-autocomplete-border-hover: var(--fc-gray-400);
     --fc-autocomplete-border-focus: var(--fc-primary-400);
-    --fc-autocomplete-placeholder: var(--fc-gray-500);
+    --fc-autocomplete-placeholder: var(--fc-gray-400);
 
+    --fc-autocomplete-max-width: 412px;
     --fc-autocomplete-padding: var(--fc-space-3);
     --fc-autocomplete-border-width: var(--fc-border-width-xs);
     --fc-autocomplete-radius: var(--fc-radius-md);
