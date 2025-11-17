@@ -22,6 +22,27 @@ export class FcAutoComplete extends HTMLElement {
 		shadow.appendChild(
 			template.content.cloneNode(true) // clone our html and css template and append it to the shadow DOM
 		); 
+
+		/* about 'bind(this)':
+		o .bind(this) "amarra" o contexto. Ele garante que, quando a funcao onInput rodar, o this na função onInput continue sendo a 
+		instância da classe FcAutoComplete (o elemento <fc-autocomplete>), sem isso, o 'this' lá dentro estaria se 
+		referindo ao elemento <Input>, isso eh importante pq a função onInput procura elementos <options> dentro de this,
+		
+		options fica dentro de <fc-autocomplete>, se não houvesse bind(this), ele iria procurar <options> dentro do <input>,
+		que está dentro de <fc-autocomplete>, e não acharia nada
+
+		ou seja, durante o constructor, precisamos bindar qualquer funcao que criamos aqui que use event listeners. o bind precisa
+		ser feito aqui, pois se for feito direto no connectCallback de construcao do listener, toda vez uma instancia nova da funcao
+		seria criada, causando memory leak, para resolver, ao construir uma instancia do componente, pegamos todas as funcoes que
+		estao em listeners e bindamos o componentes a eles por aqui v
+		*/
+
+		this.onInput = this.onInput.bind(this);
+		this.onOptionSelect = this.onOptionSelect.bind(this);
+		this.onOutsideClick = this.onOutsideClick.bind(this);
+		this.onFocusOut = this.onFocusOut.bind(this);
+		this.onFocus = this.onFocus.bind(this);
+
 	}
 
 	/* defines getter and setter methods for newly created properties, which are 'value' and 'selected'.
@@ -100,42 +121,24 @@ export class FcAutoComplete extends HTMLElement {
 
 		/* this functions add an input event listener to the input element, whenever the users type anything,
 		our 'oninput' function will be called.
-
-		about 'bind(this)':
-		o .bind(this) "amarra" o contexto. Ele garante que, quando onInput rodar, o this na função onInput continue sendo a 
-		instância da classe FcAutoComplete (o elemento <fc-autocomplete>), sem isso, o 'this' lá dentro estaria se 
-		referindo ao elemento <Input>, isso é importante pq a função onInput procura elementos <options> dentro de this,
-		
-		options fica dentro de <fc-autocomplete>, se não houvesse bind(this), ele iria procurar <options> dentro do <input>,
-		que está dentro de <fc-autocomplete>, e não acharia nada
 		*/
-		this.inputEl.addEventListener('input', this.onInput.bind(this));
+		this.inputEl.addEventListener('input', this.onInput);
 
 		/* this functions add an 'fc-option-select' event listener to our element, fc-option-select is a custom event
 		created inside the <option> element, that launches whenever the users click on the option
 		so, when this happens, onOptionSelect function will be called.
-
-		.bind(this) is the same here
 		*/
-		this.addEventListener('fc-option-select', this.onOptionSelect.bind(this) as EventListener);
+		this.addEventListener('fc-option-select', this.onOptionSelect as EventListener);
 
 		/* this listener is for when the user clicks outside the input so the dropdown can close this is a DOM event 
 		listener, so it must be cleaned onDisconnectCallback (when the element is removed from the dom) to prevent memory leak */
-		document.addEventListener('click', this.handleOutsideClick.bind(this) as EventListener);
+		document.addEventListener('click', this.onOutsideClick as EventListener);
 
 		/* this listener is for when the user clicks outside the input so the dropdown can close  */
-		this.addEventListener('focusout', this.handleFocusOut.bind(this) as EventListener);
+		this.addEventListener('focusout', this.onFocusOut as EventListener);
 
 		// this listener is for when the user clicks on the input again (and it already had text)
-		this.inputEl.addEventListener('focus', () => {
-			const query = this.inputEl.value.toLowerCase().trim();
-			const options = Array.from(this.querySelectorAll('fc-option'));
-			const hasMatch = options.some((option) => {
-				const label = (option.getAttribute('label') || option.textContent || '').toLowerCase();
-				return label.includes(query);
-			});
-			this.toggleDropdown(hasMatch && query.length > 0);
-		});
+		this.inputEl.addEventListener('focus', this.onFocus);
 	}
 
 	/* this is the function that runs whenever an observed attribute is changed (via JS), note: this is called 
@@ -152,8 +155,9 @@ export class FcAutoComplete extends HTMLElement {
 	to clean (remove) any event listener that is binded to the DOM. */
 
 	disconnectedCallback() {
-		document.removeEventListener('click', this.handleOutsideClick);
+		document.removeEventListener('click', this.onOutsideClick);
 	}
+
 	/** helper functions for the eventListeners */
 
 	private onInput(e: Event) {
@@ -170,7 +174,7 @@ export class FcAutoComplete extends HTMLElement {
 
 			const match = label.includes(query); // checks if the query is on the label name
 
-			option.style.display = match ? 'block' : 'none'; // if so, show the option
+			option.toggleAttribute('hidden', !match); // if so, show the option
 
 			if (match) { // set hasMatch to true, to toggledropdown
 				hasMatch = true;
@@ -210,16 +214,26 @@ export class FcAutoComplete extends HTMLElement {
 		);
 	}
 
-	private handleOutsideClick(e: MouseEvent) { // will check whether the click was outside or inside the component, to close the dropdown
+	private onOutsideClick(e: MouseEvent) { // will check whether the click was outside or inside the component, to close the dropdown
 		if (!this.contains(e.target as Node)) {
 			this.toggleDropdown(false);
 		}
 	}
 
-	private handleFocusOut(e: FocusEvent) { // If the newly-focused element is outside the component, close
+	private onFocusOut(e: FocusEvent) { // If the newly-focused element is outside the component, close
 		if (!this.contains(e.relatedTarget as Node)) {
 			this.toggleDropdown(false);
 		}
+	};
+
+	private onFocus(e: FocusEvent) {
+		const query = this.inputEl.value.toLowerCase().trim();
+		const options = Array.from(this.querySelectorAll('fc-option'));
+		const hasMatch = options.some((option) => {
+			const label = (option.getAttribute('label') || option.textContent || '').toLowerCase();
+			return label.includes(query);
+		});
+		this.toggleDropdown(hasMatch && query.length > 0);
 	};
 
 	private toggleDropdown(show: boolean) {
@@ -232,6 +246,9 @@ export class FcAutoComplete extends HTMLElement {
 		// if it should be open
 		if (show) {
 			dropdown.hidden = false;
+
+			this.setAttribute('open', 'true');
+
 
 			// quickly unhide children so scrollHeight is correct
 			dropdown.style.height = "auto";
