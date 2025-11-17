@@ -42,10 +42,10 @@ export const styles = `
 		left: 0;
 		right: 0;
 		z-index: 10;
-		background: var(--fc-autocomplete-dropdown-bg, --fc-autocomplete-bg);
+		background: var(--fc-autocomplete-dropdown-bg, var(--fc-autocomplete-bg));
 		border: var(--fc-autocomplete-border-width) solid var(--fc-autocomplete-border);
-		border-radius: var(--fc-autocomplete-dropdown-radius);
-		padding: var(--fc-autocomplete-dropdown-padding, --fc-autocomplete-padding);
+		border-radius: var(--fc-autocomplete-dropdown-radius, var(--fc-autocomplete-radius));
+		padding: var(--fc-autocomplete-dropdown-padding, var(--fc-autocomplete-padding));
 		box-shadow: var(--fc-autocomplete-dropdown-shadow);
 		max-height: var(--fc-autocomplete-dropdown-max-height, 240px);
 		overflow-y: auto;
