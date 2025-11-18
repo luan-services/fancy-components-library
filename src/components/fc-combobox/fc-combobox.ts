@@ -263,6 +263,7 @@ export class FcComboBox extends HTMLElement {
 		options.forEach((option) => {
 			const selected = (option.value === value); // checks if the selected option is the current option
 			option.selected = selected // if so, set the option as selected, if not, remove selected attribute(query === label)
+			option.style.display = selected ? 'block' : 'none'; // if so, show the option
         });
 
 		this.toggleDropdown(false); // close dropdown
@@ -308,49 +309,18 @@ export class FcComboBox extends HTMLElement {
 		// if it should be open
 		if (show) {
 			dropdown.hidden = false;
-
 			this.setAttribute('open', 'true');
-
-
-			// quickly unhide children so scrollHeight is correct
-			dropdown.style.height = "auto";
-			const fullHeight = dropdown.scrollHeight + "px";
-			dropdown.style.height = "0px"; // hide again
-
-			// write CSS var
-			dropdown.style.setProperty("--fc-height", fullHeight);
-
-			requestAnimationFrame(() => {
-				dropdown.dataset.state = "open";
-			});
-
 			this.inputEl.setAttribute("aria-expanded", "true");
 			return;
 		}
 
-		// if it should close
-		const fullHeight = dropdown.scrollHeight + "px";
-		dropdown.style.setProperty("--fc-height", fullHeight);
-
-		dropdown.dataset.state = "closing";
+		this.dropdownEl.hidden = true;
+		this.removeAttribute('open');
 		this.inputEl.setAttribute("aria-expanded", "false");
 
-		const onEnd = () => {
-			if (dropdown.dataset.state === "closing") {
-				dropdown.hidden = true;
-				dropdown.style.height = "0px";
-				dropdown.dataset.state = "";
-				// this.removeAttribute("open");
-			}
-			dropdown.removeEventListener("animationend", onEnd);
-		};
-		
-		dropdown.addEventListener("animationend", onEnd);
 	}
-
-
 	
-	setProps(props: Record<string, any>) { // props type defines an array with {string : anytype }
+	public setProps(props: Record<string, any>) { // props type defines an array with {string : anytype }
 		
 		for (const property in props) { // for each key in props
 
