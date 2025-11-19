@@ -52,4 +52,22 @@ export const styles = `
 		overflow-y: auto;
 		box-sizing: border-box;
 	}
+
+	:host([disabled]) {
+        cursor: not-allowed;
+    }
+
+	.fc-input:disabled {
+		background: var(--fc-combobox-disabled-bg);
+        cursor: not-allowed;
+		box-shadow: none;
+    }
+
+	.fc-input:disabled:hover {
+		border-color: var(--fc-combobox-border);
+	}
+
+	.fc-input:disabled:focus {
+		border-color: var(--fc-combobox-border);
+	}
 `;

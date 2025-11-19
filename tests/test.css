@@ -8,6 +8,11 @@
 
 :root[fc-theme="dark"] {
     background-color:  #27272a;
+    
+    .container {
+        background-color:  #18181b;
+        border: 1px solid #b5b5b5;
+    }
 }
 
 .container {
@@ -19,11 +24,6 @@
     border-radius: 8px;
     padding: 16px;
 
-}
-
-.container[fc-theme="dark"] {
-    background-color:  #18181b;
-    border: 1px solid #b5b5b5;
 }
 
 /* custom css to test components */

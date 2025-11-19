@@ -1,5 +1,6 @@
 import { template } from './fc-combobox.template';
 import { FcOption } from '../fc-option';
+// v1.0.0
 
 
 /* in this component, the properties 'label' and 'value' doesn't exist as ACTUAL attributes:
@@ -22,7 +23,7 @@ export class FcComboBox extends HTMLElement {
 	/* this is a static method that tells the browser which atributes should be 'watched', that means whenever 'name' 
 	or 'placeholder' attributes are set by the user like <fc-combobox name="a">, 'attributeChangedCallback' will be called. */
 	static get observedAttributes() {
-		return ['placeholder', 'name'];
+		return ['placeholder', 'name', 'disabled'];
 	}
 
 	/* these are declared attributes, that later on will receive both elements from the shadowRoot with 
@@ -92,6 +93,35 @@ export class FcComboBox extends HTMLElement {
 		are used to manipulate the <fc-combobox> attributes.
 	*/
 
+	get placeholder() {
+		return this.getAttribute("placeholder") ?? "";
+	}
+
+	set placeholder(val: string) {
+		this.setAttribute("placeholder", val);
+	}
+
+	get name() {
+		return this.getAttribute('name') ?? '';
+	}
+
+	set name(val: string) {
+		this.setAttribute('name', val);
+	}
+
+	get disabled() {
+		return this.hasAttribute('disabled');
+	}
+
+	set disabled(val: boolean) {
+		if (val) {
+			this.setAttribute('disabled', 'true');
+			return;
+		} 
+		
+		this.removeAttribute('disabled');
+	}
+
 	/* value is a getter only, you cannot set an initial value, you can only do it by typing or clicking on an option
 	*/
 	get value() {
@@ -137,22 +167,6 @@ export class FcComboBox extends HTMLElement {
 				composed: true,
 			})
 		);
-	}
-
-	get placeholder() {
-		return this.getAttribute("placeholder") ?? "";
-	}
-
-	set placeholder(val: string) {
-		this.setAttribute("placeholder", val);
-	}
-
-	get name() {
-		return this.getAttribute('name') ?? '';
-	}
-
-	set name(val: string) {
-		this.setAttribute('name', val);
 	}
 
 	get options() {
@@ -218,6 +232,12 @@ export class FcComboBox extends HTMLElement {
 			this.internals.setFormValue(this.value); 
 		}
 
+		if (this.hasAttribute('disabled')) {
+			/* applying 'disabled' to the input if <fc-combobox> has 'disabled*/
+			this.inputEl.disabled = true;
+			this.internals.ariaDisabled = 'true';
+		}
+
 		/* this functions add an input event listener to the input element, whenever the users type anything,
 		our 'oninput' function will be called.
 		*/
@@ -266,6 +286,17 @@ export class FcComboBox extends HTMLElement {
 			// it will be '' if no option is selected on mount (default) (this.value means calling get value())
 			this.internals.setFormValue(this.value);
 		}
+
+		if (name === 'disabled' && this.inputEl) {
+			const isDisabled = this.hasAttribute('disabled');
+			this.inputEl.disabled = isDisabled; // if disabled changes to true, pass it to the child input
+			this.internals.ariaDisabled = isDisabled ? 'true' : 'false';
+			// if we are disabling ensure the dropdown closes
+			if (isDisabled) {
+				this.toggleDropdown(false);
+			}
+		}
+
 	}
 	
 	/* this is the cleaning up function, it'll be called when the element is REMOVED from the DOM, here, we want
@@ -333,6 +364,11 @@ export class FcComboBox extends HTMLElement {
 	private onOptionSelect(e: CustomEvent) {
 		const { value, label } = e.detail; // detail are the properties of the custom event from option
 
+		//prevent selecting option if disabled
+		 if (this.disabled) {
+			return;
+		 }
+
 		this.inputEl.value = label; // updates the input text to the option text
 		this.optionValue = value; // updates the value property of <fc-combobox>
 		this.internals.setFormValue(value); // also update the form 'value' property: <fc-combobox value="">
@@ -375,6 +411,11 @@ export class FcComboBox extends HTMLElement {
 	}
 
 	private onFocus(e: FocusEvent) {
+		// do not open if disabled
+		if (this.disabled) {
+			return;
+		}
+
 		/*
 		const query = this.inputEl.value.toLowerCase().trim();
 		const options = Array.from(this.querySelectorAll('fc-option'));
@@ -384,6 +425,7 @@ export class FcComboBox extends HTMLElement {
 		});
 		this.toggleDropdown(hasMatch && query.length > 0);
 		*/
+		
 		this.toggleDropdown(true);
 	};
 
@@ -391,6 +433,10 @@ export class FcComboBox extends HTMLElement {
 		if (!this.dropdownEl) {
 			return;
 		};
+
+		if (this.disabled && show) { // prevents dropdown toggle if <fc-combobox> has 'disabled' attribute
+			return;
+		}
 
 		const dropdown = this.dropdownEl;
 

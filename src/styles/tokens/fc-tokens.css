@@ -4,6 +4,7 @@
 
     /* combobox component */
     --fc-combobox-bg: var(--fc-white);
+    --fc-combobox-disabled-bg: var(--fc-gray-200);
     --fc-combobox-fg: var(--fc-gray-900);
     --fc-combobox-border: var(--fc-gray-300);
     --fc-combobox-border-hover: var(--fc-gray-400);
