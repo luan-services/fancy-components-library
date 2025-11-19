@@ -69,6 +69,9 @@ export class FcComboBox extends HTMLElement {
 		this.onFocusOut = this.onFocusOut.bind(this);
 		this.onFocus = this.onFocus.bind(this);
 
+		/* function to prevent focus going to the div dropdown on click inside it but not on options */
+		this.onDropdownClick = this.onDropdownClick.bind(this);
+
 	}
 
 	/* defines getter and setter methods for attributes and also for properties
@@ -233,8 +236,18 @@ export class FcComboBox extends HTMLElement {
 		/* this listener is for when the user clicks outside the input so the dropdown can close  */
 		this.addEventListener('focusout', this.onFocusOut as EventListener);
 
-		// this listener is for when the user clicks on the input again (and it already had text)
+		/* this listener is for when the user clicks on the input again (and it already had text) */
 		this.inputEl.addEventListener('focus', this.onFocus);
+
+		/* this listener is for when the user clicks on the dropdown, to prevent focusout to launch,
+			by default, when tabbing, the focus goes to focusable element inside our fc-combobox (the buttons inside options),
+			
+			the div is skipped because by default divs are elements that cannot hold focus (and they should not), the problem
+			is, if an user click (instead of tab), the browser will try to move the focus to the div, it'll fail and the
+			focus will go back to 'body', this way, focusout will be called, and since body is not inside <fc-combobox> toggleDropdown 
+			will be called 
+		*/
+		this.dropdownEl.addEventListener('mousedown', this.onDropdownClick);
 	}
 
 	/* this is the function that runs whenever an observed attribute is changed (via JS), note: this is called 
@@ -355,6 +368,11 @@ export class FcComboBox extends HTMLElement {
 			this.toggleDropdown(false);
 		}
 	};
+
+	// prevent focus (trying to go) going to the <div> dropdown when click on it
+	private onDropdownClick(e: MouseEvent) {
+		e.preventDefault();
+	}
 
 	private onFocus(e: FocusEvent) {
 		/*
