@@ -9,7 +9,14 @@ export const styles = `
 
 	:host([hidden]) {
         display: none !important;
+		
+        cursor: not-allowed;
     }
+
+	:host([disabled]) {
+        cursor: not-allowed;
+    }
+		
 		
 	button.fc-option {
 		width: 100%;
@@ -34,7 +41,7 @@ export const styles = `
 	button.fc-option:disabled {
 		color: var(--fc-option-disabled-fg);
 		background: var(--fc-option-disabled-bg);
-        cursor: not-allowed;
+		pointer-events: none;
 		box-shadow: none;
 	}
 

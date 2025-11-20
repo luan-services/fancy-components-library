@@ -341,15 +341,16 @@ export class FcComboBox extends HTMLElement {
 
 			const matchExactly = (rawQuery === rawLabel && query.length > 0); // checks if the query is exactly the option
 
-			if (matchExactly) { // if match exactly, set the option as selected, if not, remove selected attribute(query === label)
+			if (matchExactly && !option.disabled) { // if match exactly, set the option as selected, if not, remove selected attribute (query === label)
 				matchExactlyValue = option.value;
-				option.selected = true;
+				option.selected = true; // do not set as selected anymore, just update the form value below.
 				return;
 			}
 
 			option.selected = false;
 		});
 		
+		// here, update only de form value
 		this.optionValue = matchExactlyValue; // updates the value property of <fc-combobox>
 		this.internals.setFormValue(matchExactlyValue); // also update the form 'value' property: <fc-combobox value="">
 
@@ -425,17 +426,15 @@ export class FcComboBox extends HTMLElement {
 			return;
 		}
 
-		/*
 		const query = this.inputEl.value.toLowerCase().trim();
 		const options = Array.from(this.querySelectorAll('fc-option'));
-		const hasMatch = options.some((option) => {
+
+		const match = options.some((option) => {
 			const label = (option.getAttribute('label') || option.textContent || '').toLowerCase();
 			return label.includes(query);
 		});
-		this.toggleDropdown(hasMatch && query.length > 0);
-		*/
-		
-		this.toggleDropdown(true);
+
+		this.toggleDropdown(match);
 	};
 
 	private toggleDropdown(show: boolean) {

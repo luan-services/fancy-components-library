@@ -144,6 +144,8 @@ export class FcOption extends HTMLElement {
 		}));
 	};
 
+
+
 	/* this is a helper method to update the aria-selected attribute */
 
 	private updateSelection() {
