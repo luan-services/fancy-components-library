@@ -195,7 +195,7 @@ export class FcComboBox extends HTMLElement {
         }));
     }
 	
-    public set options(data: { label: string, value: string }[]) {
+    public set options(data: { label: string, value: string, disabled?: boolean }[]) {
 		
 		// get already existing options and remove them (to prevent error if the user is trying to set options more than once)
         const oldOptions = this.querySelectorAll('fc-option');
@@ -210,8 +210,11 @@ export class FcComboBox extends HTMLElement {
             optEl.setAttribute('label', element.label); 
             optEl.textContent = element.label;
 
-            // Passo C: Injeta no Light DOM (dentro do <fc-combobox>)
-            // Isso permite que o this.querySelectorAll('fc-option') do onInput as encontre.
+			if (element.disabled) {
+				optEl.setAttribute('disabled', '');
+			}
+
+            // injects on Light DOM (inside do <fc-combobox>), this is not good for SEO because all options text won't be ready until js runs
             this.appendChild(optEl);
         });
 	}
