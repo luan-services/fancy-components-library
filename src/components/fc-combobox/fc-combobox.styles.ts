@@ -1,3 +1,4 @@
+// every element must have box-sizing border box as a pattern (element dimensions will be correctly set)
 export const styles = `
 	:host {
 		display: block;

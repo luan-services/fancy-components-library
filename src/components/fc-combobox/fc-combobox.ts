@@ -15,6 +15,11 @@ import { FcOption } from '../fc-option';
 	value - as said above, it is a mirror, but it also will be the formElement value
 	label - as said above, another mirror
 
+	hidden - is a built-in attribute for any HTMLElement, you don't need to set it, you just can call this.hidden = true/false
+
+	disabled - on <fc-combobox> it is an actual custom attribute, because not every HTMLElement has disabled built it, but
+	we also set inputEl.disabled = true -> here disabled is built-in, because every Input has 'disabled' by default
+
 	options (set and get) - used to add <fc-option> elements inside the combobox with js
 */
 
@@ -93,27 +98,27 @@ export class FcComboBox extends HTMLElement {
 		are used to manipulate the <fc-combobox> attributes.
 	*/
 
-	get placeholder() {
+	public get placeholder() {
 		return this.getAttribute("placeholder") ?? "";
 	}
 
-	set placeholder(val: string) {
+	public set placeholder(val: string) {
 		this.setAttribute("placeholder", val);
 	}
 
-	get name() {
+	public get name() {
 		return this.getAttribute('name') ?? '';
 	}
 
-	set name(val: string) {
+	public set name(val: string) {
 		this.setAttribute('name', val);
 	}
 
-	get disabled() {
+	public get disabled() {
 		return this.hasAttribute('disabled');
 	}
 
-	set disabled(val: boolean) {
+	public set disabled(val: boolean) {
 		if (val) {
 			this.setAttribute('disabled', 'true');
 			return;
@@ -124,17 +129,17 @@ export class FcComboBox extends HTMLElement {
 
 	/* value is a getter only, you cannot set an initial value, you can only do it by typing or clicking on an option
 	*/
-	get value() {
+	public get value() {
 		return this.optionValue;
 	}
 
-	get label() {
+	public get label() {
 		return this.inputEl?.value ?? '';
 	}
 
 	/* value and label must coexist together, so it needs only one setter that sets both
 	*/
-	set current(data: {value: string, label: string}) {
+	public set current(data: {value: string, label: string}) {
 		if (!data || !data.label || !data.value) {
 			return;
 		}
@@ -153,6 +158,7 @@ export class FcComboBox extends HTMLElement {
 		options.forEach(option => {
 			const isSelected = option.value === data.value;
 			option.selected = isSelected;
+			option.hidden = !isSelected;
 		});
 
 		this.toggleDropdown(false);
@@ -169,7 +175,7 @@ export class FcComboBox extends HTMLElement {
 		);
 	}
 
-	get options() {
+	public get options() {
 		// search at the shadow dom for the 'slot' element
 		const slot:HTMLSlotElement | null = this.shadowRoot!.querySelector('slot'); 
 		/* doing only 'slot' will get the first slot element
@@ -189,7 +195,7 @@ export class FcComboBox extends HTMLElement {
         }));
     }
 	
-    set options(data: { label: string, value: string }[]) {
+    public set options(data: { label: string, value: string }[]) {
 		
 		// get already existing options and remove them (to prevent error if the user is trying to set options more than once)
         const oldOptions = this.querySelectorAll('fc-option');
@@ -324,7 +330,7 @@ export class FcComboBox extends HTMLElement {
 			const label = rawLabel.toLowerCase(); // gets the label on the option
 
 			const match = label.includes(query); // checks if the query is on the label name
-			option.style.display = match ? 'block' : 'none'; // if so, show the option
+			option.hidden = !match // if so, show the option
 
 			if (match) { // set hasMatch to true, to toggledropdown
 				hasMatch = true;
@@ -378,8 +384,8 @@ export class FcComboBox extends HTMLElement {
 
 		options.forEach((option) => {
 			const selected = (option.value === value); // checks if the selected option is the current option
-			option.selected = selected // if so, set the option as selected, if not, remove selected attribute(query === label)
-			option.style.display = selected ? 'block' : 'none'; // if so, show the option
+			option.selected = selected // if so, set the option as selected by calling set selected from child fc-option, if not, remove selected attribute(query === label)
+			option.hidden = !selected // if so, show the option
         });
 
 		this.toggleDropdown(false); // close dropdown

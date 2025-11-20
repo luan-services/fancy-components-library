@@ -6,7 +6,7 @@ export class FcOption extends HTMLElement {
 	/* this is a static method that tells the browser which atributes should be 'watched', that means
 	whenever 'value' or 'selected' changes, 'attributeChangedCallback' will be called. */
 	static get observedAttributes() { 
-		return ['value', 'label', 'selected'];
+		return ['value', 'label', 'selected', 'disabled'];
 	}
 
 	/* this is the class constructor, whenever you create a new element on js or at the dom, this will be called */
@@ -16,6 +16,9 @@ export class FcOption extends HTMLElement {
 		shadow.appendChild(
 			template.content.cloneNode(true) // clone our html and css template and append it to the shadow DOM
 		); 
+
+		// binding onClick listener
+		this.onClick = this.onClick.bind(this);
 	}
 
 	/* defines getter and setter methods for newly created properties, which are 'value' and 'selected'.
@@ -38,11 +41,11 @@ export class FcOption extends HTMLElement {
 		this.setAttribute('value', data);
 	}
 
-	get label() { // label is the inner text that are shown on the option element, 'value' is the hidden value
+	public get label() { // label is the inner text that are shown on the option element, 'value' is the hidden value
 		return this.getAttribute('label') ?? this.textContent ?? '';
 	}
 
-	set label(val: string) {
+	public set label(val: string) {
 		this.setAttribute('label', val);
 		this.textContent = val; // update the innertext of the option element
 	}
@@ -65,13 +68,33 @@ export class FcOption extends HTMLElement {
 		this.removeAttribute('selected'); // if not, remove it
 	}
 
+	public get disabled() {
+		return this.hasAttribute('disabled');
+	}
+
+	public set disabled(val: boolean) {
+		if (val) {
+			this.setAttribute('disabled', '');
+			return;
+		} 
+		this.removeAttribute('disabled');
+	}
+
 	/* this is the function that will be called when the element is inserted in the DOM */
 
 	connectedCallback() {
+
+		const btn = this.shadowRoot!.querySelector('button')!;
+
+		if (this.disabled && btn) { // apply initial disabled state to option when creating the element
+			btn.disabled = true;
+			btn.setAttribute('aria-disabled', 'true');
+		}
+
 		/* this is the most powerful option for framework compatibility, by default events from web components
 	 	with with shadow DOM, cannot be heard by anything outside it.
 		
-		so, to its father <fc-autocomplete> to know when a option is clicked, the user must set an click event listener,
+		so, to its father <fc-combobox> to know when a option is clicked, the user must set an click event listener,
 		after that the father will now it was clicked, will know its value, and will change its 'selected' value (calling
 		set selected, yes the father will call it).
 
@@ -80,19 +103,7 @@ export class FcOption extends HTMLElement {
 		it can also call their methods when the user type the exact 'value' of the option.
 		*/
 
-		this.shadowRoot!.querySelector('button')!.addEventListener('click', () => {
-			
-			this.dispatchEvent(new CustomEvent('fc-option-select', 
-				{
-					detail: { 
-						value: this.value, 
-						label: this.label 
-					},
-					bubbles: true, // bubbles lets this event goes up to its father (needs composed)
-					composed: true // composed lets this event cross the shadow DOM
-				}
-			));
-		});
+		btn.addEventListener('click', this.onClick as EventListener);
 	}
 
 	/* this is the function that runs whenever an observed attribute is changed, note: this is called 
@@ -103,7 +114,35 @@ export class FcOption extends HTMLElement {
 		if (name === 'selected') { // guarantees the aria-selected to be correctly updated
 			this.updateSelection(); 
 		}
+
+		if (name === 'disabled') { // handling disabled being set with js (cbFruits.disabled = true)
+			const btn = this.shadowRoot?.querySelector('button');
+			
+			if (btn) {
+				const isDisabled = this.hasAttribute('disabled');
+				btn.disabled = isDisabled;
+				// Aria-disabled is needed because role="option" can override native button semantics
+				btn.setAttribute('aria-disabled', isDisabled.toString());
+			};
+		}
 	}
+
+	private onClick(e: Event) {
+		if (this.disabled) { // prevents any event dispatch if the option is disabled
+			e.preventDefault();
+			e.stopPropagation(); 
+			return;
+		}
+		
+		this.dispatchEvent(new CustomEvent('fc-option-select', {
+			detail: { 
+				value: this.value, 
+				label: this.label 
+			},
+			bubbles: true, // bubbles lets this event goes up to its father (needs composed)
+			composed: true // composed lets this event cross the shadow DOM
+		}));
+	};
 
 	/* this is a helper method to update the aria-selected attribute */
 
@@ -115,7 +154,7 @@ export class FcOption extends HTMLElement {
 		button.setAttribute('aria-selected', this.selected ? 'true' : 'false');
 	}
 
-	setProps(props: Record<string, any>) { // props type defines an array with {string : anytype }
+	public setProps(props: Record<string, any>) { // props type defines an array with {string : anytype }
 		
 		for (const property in props) { // for each key in props
 
