@@ -78,6 +78,9 @@ export class FcComboBox extends HTMLElement {
 		/* function to prevent focus going to the div dropdown on click inside it but not on options */
 		this.onDropdownClick = this.onDropdownClick.bind(this);
 
+		/* exclusive function for react see below */
+		this.onSlotChange = this.onSlotChange.bind(this);
+
 	}
 
 	/* defines getter and setter methods for attributes and also for properties
@@ -277,6 +280,21 @@ export class FcComboBox extends HTMLElement {
 			will be called 
 		*/
 		this.dropdownEl.addEventListener('mousedown', this.onDropdownClick);
+
+
+    
+		/* this listeners is for react-only, rendering elements on react is a bit different, sometimes, it might render
+		<fc-combobox> BEFORE <fc-option>, so when it first runs, it might miss the <fc-options>'s and not initialize it correctly 
+
+		this is a case where fc-combobox
+		
+		ie: this must be done for every created slot for react to work, since we have only 1, we do 'slot', but it could be 
+		'slot[name="label"]'
+		*/
+
+		const slot = this.shadowRoot!.querySelector('slot');
+		slot?.addEventListener('slotchange', this.onSlotChange);
+			
 	}
 
 	/* this is the function that runs whenever an observed attribute is changed (via JS), note: this is called 
@@ -478,6 +496,20 @@ export class FcComboBox extends HTMLElement {
 		});
 
 		this.toggleDropdown(match);
+	};
+
+	// specif function for react to ensure <fc-combobox> value property will be correctly added to the <fc-option> that was added later
+	private onSlotChange() {
+		if (this.optionValue && !this.inputEl.value) { // if we have a value set on the parent, but no label text yet
+			const options = Array.from(this.querySelectorAll('fc-option')) as FcOption[];
+			const match = options.find(o => o.value === this.optionValue);
+			
+			// select it
+			if (match) {
+				this.inputEl.value = match.label;
+				match.selected = true;
+			}
+		};
 	};
 
 	private toggleDropdown(show: boolean) {
