@@ -406,6 +406,19 @@ export class FcComboBox extends HTMLElement {
 		// get all option elements and makes an array
 		const options = Array.from(this.querySelectorAll('fc-option')) as FcOption[];
 
+		// if query is empty, show all options and close
+		if (query.length === 0) { 
+			options.forEach(opt => {
+				opt.hidden = false;
+				opt.selected = false;
+			});
+
+			this.optionValue = '';
+			this.internals.setFormValue(''); 
+			this.toggleDropdown(true);
+			return; 
+		}
+
 		let hasMatch = false;
 
 		let finalValue = ''; // attribute to store the value of an option if the option matches exactly the query
@@ -453,7 +466,7 @@ export class FcComboBox extends HTMLElement {
 		));
 
 		// toggles dropdown if match - true and the options quantity > 0
-		this.toggleDropdown(hasMatch && query.length > 0);
+		this.toggleDropdown(hasMatch);
 	}
 	
 	// when an option is selected, calls this
