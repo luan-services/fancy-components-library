@@ -130,7 +130,6 @@ export class FcOption extends HTMLElement {
 	private onClick(e: Event) {
 		if (this.disabled) { // prevents any event dispatch if the option is disabled
 			e.preventDefault();
-			e.stopPropagation(); 
 			return;
 		}
 		
@@ -143,8 +142,6 @@ export class FcOption extends HTMLElement {
 			composed: true // composed lets this event cross the shadow DOM
 		}));
 	};
-
-
 
 	/* this is a helper method to update the aria-selected attribute */
 
