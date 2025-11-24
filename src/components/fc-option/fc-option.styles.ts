@@ -45,7 +45,7 @@ export const styles = `
 
     button.fc-option:disabled:hover {
 		background: var(--fc-option-disabled-bg);
-	};
+	}
 
 	button.fc-option[aria-selected="true"] {
 		background: var(--fc-option-bg-selected);
