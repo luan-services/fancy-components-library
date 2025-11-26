@@ -2,18 +2,23 @@
 component folder (index.ts), and re-exports it
 
 it also creates a defineAll(); function, which lets the user define all components at once */
+
 import "./styles";
 import { FcCombobox, defineCombobox } from "./components/fc-combobox/index";
 import { FcOption, defineOption } from "./components/fc-option/index";
+import { FcInput, defineInput } from "./components/fc-input";
 
 export { 
     FcCombobox, // these are the types that are being exported so the users can use it on TypeScript
     defineCombobox, 
     FcOption,
-    defineOption
+    defineOption,
+    FcInput,
+    defineInput
 }
 
 export const defineAll = () => {
     defineCombobox();
     defineOption();
+    defineInput();
 }
