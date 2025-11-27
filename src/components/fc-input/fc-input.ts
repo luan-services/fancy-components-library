@@ -361,7 +361,7 @@ export class FcInput extends HTMLElement {
 		this.syncValidity();
 
 		if (this.hasAttribute('name') && this.type !== 'file') {
-			this.internals.setFormValue(this.value);
+			this.internals.setFormValue(this._value);
 		}
 
         /*  adding event listeners to the child inputEl so we can emit CustomEvents*/
@@ -403,11 +403,18 @@ export class FcInput extends HTMLElement {
                 break;
 
 			case 'value':
-				if (this.type !== 'file' && this.inputEl.value !== newVal) {
-					this.inputEl.value = newVal;
-					this.internals.setFormValue(newVal);
-					this.syncValidity();
-				}
+				// This calls the setter, which updates _value, if (fc-input) didnt load, it just updates memory, if so are connected, it updates the UI too.
+				if (this.type === 'file') { // before setting a initial value, checks if it is a file type input
+                    break; 
+                }
+
+                if (this.inputEl) { // if inputEl doesn't exist yet, value will be stored on the private _value attribute, for react compatibility 
+                    this.inputEl.value = newVal; // if not, update inner inputEl value
+                    this.syncValidity(); // and also validate and synchrozine it
+                }
+
+                this._value = newVal; // sets private _value attribute, just like optionValue on <fc-combobox>
+                this.internals.setFormValue(newVal); // also updates formValue so forms can check <fc-input> value
 				break;
 
 			case 'disabled':
@@ -486,12 +493,18 @@ export class FcInput extends HTMLElement {
 
 	/* if there is a button type="reset" on the form, and the user clicks it, this function will be run */
 	formResetCallback() {
-		if (this.inputEl) {
-            this.inputEl.value = '';
+		if (this.type === 'file') { // before setting a value, checks if it is a file type input
+            return; 
         }
-		this.removeAttribute('touched'); // remove touched on reset
+
+		if (this.inputEl) { // if inputEl doesn't exist yet, value will be stored on the private _value attribute, for react compatibility 
+			this.inputEl.value = ''; // if not, update inner inputEl value
+		}
+
+		this._value = ''; // sets private _value attribute, just like optionValue on <fc-combobox>
 		this.internals.setFormValue('');
 		this.syncValidity();
+		this.removeAttribute('touched'); // remove touched on reset
 	}
 
 	/* this runs whenever the user click on return on the page and them go back to the form page again,
@@ -502,12 +515,17 @@ export class FcInput extends HTMLElement {
         }
 		const restoredValue = state as string;
 		if (restoredValue) {
-			this.value = restoredValue;
-			if (this.inputEl) {
-                this.inputEl.value = restoredValue;
+			if (this.type === 'file') { // before setting a initial value, checks if it is a file type input
+                return; 
             }
-			this.internals.setFormValue(restoredValue);
-			this.syncValidity();
+
+            if (this.inputEl) { // if inputEl doesn't exist yet, value will be stored on the private _value attribute, for react compatibility 
+                this.inputEl.value = restoredValue; // if not, update inner inputEl value
+                this.syncValidity(); // and also validate and synchrozine it
+            }
+
+            this._value = restoredValue; // sets private _value attribute, just like optionValue on <fc-combobox>
+            this.internals.setFormValue(restoredValue); // also updates formValue so forms can check <fc-input> value
 		}
 	}
 
@@ -515,6 +533,9 @@ export class FcInput extends HTMLElement {
 
 	private onInput(e: Event) {
 		const value = (e.target as HTMLInputElement).value;
+
+        // direectly update _value here to avoid loop reusing value setter
+        this._value = value;
 
 		if (this.type !== 'file') {  // update only form value if it is a file type input
             this.internals.setFormValue(value);
@@ -532,6 +553,9 @@ export class FcInput extends HTMLElement {
 
 	private onChange(e: Event) {
 		const target = e.target as HTMLInputElement;
+
+        // direectly update _value here to avoid loop reusing value setter
+        this._value = target.value;
 		this.internals.setFormValue(target.value);
 		this.syncValidity();
 		this.dispatchEvent(new CustomEvent('fc-change', { 
