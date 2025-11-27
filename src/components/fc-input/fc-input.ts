@@ -1,5 +1,5 @@
 import { template } from './fc-input.template'; // importing the base html and css for the componnet
-// v1.0.1
+// v1.0.2
 
 
 /* 
@@ -37,6 +37,30 @@ fc error will check fc-input validity internals to see if it is valid
 ARIA-LABELS AND ACESSIBILITY FOR FcInput
 
 in the future add a validate setter to let the user sets a function that check if it is valid or not (maybe)
+*/
+
+/*
+    _value (value setter and getter) here is the only attribute that is controled, which means it is different from other attributes,
+    it is designed to let the FcInput to be 'controlled' on react. In react, on a commom component, like input, when you do:
+    <input value={state} onChange={...} />
+
+    it is not actually setting an attribute 'value', react will CALL input.value setter, that's how react do it with the @lit library,
+    it won't ever set any attribute, it just call the setter. It might make a loop if they pass an useState to the value property on react
+
+    so, you can do:
+
+    <FcInput value={useState} onFcChange={(e)=>{}}/>
+
+    the briliant part: some setters, like set placeholder, actually creates an attribute with the name passed, so even on react if you do 
+    placeholder="a", it will do fc-combobox.placeholder = 'a'. and the internal logic will correctly add a placeholder attribute.
+    these are called reflecting properties, they sinchronize attributes.
+
+    'value' is a non-reflecting property, its setter does not create a 'value' attribute. It is set this way so it won't create a loop 
+    when using it on react.
+
+    on the other hand, on vanilla, any attribute added, by doing <fc-combobox placeholder="a"/> will be an set as an actual attribute,
+    and if it is an observed attribute, attributeChangecallback will be called, and it might do something
+
 */
 export class FcInput extends HTMLElement {
 	
@@ -290,12 +314,7 @@ export class FcInput extends HTMLElement {
         /* if the user did <fc-input type=""> and type is valid, set it on inputEl, else set as type="text" */
 		if (this.hasAttribute('type')) { 
             const type = this.getAttribute('type')!
-
-            if (this.ALLOWED_TYPES.includes(type)) {
-                this.inputEl.type = type;
-                return;
-            } 
-            this.inputEl.type = 'text';
+            this.ALLOWED_TYPES.includes(type) ? this.inputEl.type = type : this.inputEl.type = 'text';
         }
 
 		/* sync native inputEl boolean attributes */
@@ -360,7 +379,11 @@ export class FcInput extends HTMLElement {
 		/* doing inital validating if the element starts with any 'value' */
 		this.syncValidity();
 
-		if (this.hasAttribute('name') && this.type !== 'file') {
+		/* if 'name' exists, this component will be considered a form part, so it'll set the form 'value' property: <fc-input value="">, 
+		on the form you will see a field (name: 'fc-input name property', value: "fc-input value property")
+		but even if 'name' does not exists, it must have a formValue for the formRestore and formReset callbacks to work, browser is
+		smart enought and won't set the form field if it is the case  */
+		if (this.type !== 'file') {
 			this.internals.setFormValue(this._value);
 		}
 
@@ -386,7 +409,28 @@ export class FcInput extends HTMLElement {
 	by the browser itself, so you need to accept all these three props even if you will not be using it */
 
 	attributeChangedCallback(name: string, _oldVal: string, newVal: string) {
-		if (!this.inputEl) return;
+
+        /* 'value' is a special attribute that is design to be CONTROLED on react, so it must set a private field, that means
+        it can't depend if inputEl already exists, so it will be threated here outside the switch case */
+
+        if (name === 'value' && !(this.type === 'file')) {
+            // This calls the setter, which updates _value, if (fc-input) didnt load, it just updates memory, if so are connected, it updates the UI too.
+
+            if (this.inputEl) { // if inputEl doesn't exist yet, value will be stored on the private _value attribute, for react compatibility 
+                this.inputEl.value = newVal; // if not, update inner inputEl value
+                this.syncValidity(); // and also validate and synchrozine it
+            }
+
+            this._value = newVal; // sets private _value attribute, just like optionValue on <fc-combobox>
+            this.internals.setFormValue(newVal); // also updates formValue so forms can check <fc-input> value
+            return;
+        }
+
+        /* we can check if inputEl exists here because very attribute below will be set directly on it */
+
+		if (!this.inputEl) {
+            return;
+        }
 
 		switch (name) {
 			case 'placeholder': 
@@ -401,21 +445,6 @@ export class FcInput extends HTMLElement {
                 }
                 this.inputEl.type = 'text';
                 break;
-
-			case 'value':
-				// This calls the setter, which updates _value, if (fc-input) didnt load, it just updates memory, if so are connected, it updates the UI too.
-				if (this.type === 'file') { // before setting a initial value, checks if it is a file type input
-                    break; 
-                }
-
-                if (this.inputEl) { // if inputEl doesn't exist yet, value will be stored on the private _value attribute, for react compatibility 
-                    this.inputEl.value = newVal; // if not, update inner inputEl value
-                    this.syncValidity(); // and also validate and synchrozine it
-                }
-
-                this._value = newVal; // sets private _value attribute, just like optionValue on <fc-combobox>
-                this.internals.setFormValue(newVal); // also updates formValue so forms can check <fc-input> value
-				break;
 
 			case 'disabled':
 				this.inputEl.disabled = this.hasAttribute('disabled');
@@ -493,9 +522,6 @@ export class FcInput extends HTMLElement {
 
 	/* if there is a button type="reset" on the form, and the user clicks it, this function will be run */
 	formResetCallback() {
-		if (this.type === 'file') { // before setting a value, checks if it is a file type input
-            return; 
-        }
 
 		if (this.inputEl) { // if inputEl doesn't exist yet, value will be stored on the private _value attribute, for react compatibility 
 			this.inputEl.value = ''; // if not, update inner inputEl value

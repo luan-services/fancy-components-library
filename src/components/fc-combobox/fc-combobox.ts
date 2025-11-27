@@ -1,6 +1,6 @@
 import { template } from './fc-combobox.template';
 import { FcOption } from '../fc-option';
-// v1.0.1
+// v1.0.2
 
 /* in this component, the properties 'label' doesn't exist as an ACTUAL attribute:
 
@@ -274,13 +274,11 @@ export class FcCombobox extends HTMLElement {
 			this.inputEl.placeholder = this.getAttribute('placeholder')!;
 		}
 
-		/* if 'name' exists, this component will be considered a form part, so it'll set the form 
-		'value' property: <fc-combobox value="">, do it only once when the component is created
-		*/
-		if (this.hasAttribute('name')) {
-			/* it will be '' if no option is selected on mount (default) (this.value means calling get value()) */
-			this.internals.setFormValue(this.value); 
-		}
+		/* if 'name' exists, this component will be considered a form part, so it'll set the form 'value' property: <fc-combobox value="">, 
+		on the form you will see a field (name: 'fc-combobox name property', value: "fc-combobox value property")
+		but even if 'name' does not exists, it must have a formValue for the formRestore and formReset callbacks to work, browser is
+		smart enought and won't set the form field if it is the case  */
+		this.internals.setFormValue(this.value); 
 
 		if (this.hasAttribute('disabled')) {
 			/* applying 'disabled' to the input if <fc-combobox> has 'disabled*/
@@ -581,25 +579,32 @@ export class FcCombobox extends HTMLElement {
 
 	// specif function for react to ensure <fc-combobox> value property will be correctly added to the <fc-option> that was added later
 	private onSlotChange() {
-		if (this.optionValue && !this.inputEl.value) { // if we have a value set on the parent, but no label text yet
+		// if there is no value set internally, we don't need to sync anything
+        if (!this.optionValue) {
+			return;
+		}
 
-			const options = Array.from(this.querySelectorAll('fc-option')) as FcOption[];
-			
-			options.forEach((option) => {
-				const selected = (option.value === this.optionValue); // checks if the selected option is the current option
-				option.selected = selected // if so, set the option as selected by calling set selected from child fc-option, if not, remove selected attribute(query === label)
-				option.hidden = !selected // if so, show the option
-				option.active = false; // now it is needed to remove active status from all options when a option is selected
+        const options = Array.from(this.querySelectorAll('fc-option')) as FcOption[];
+        let foundMatch = false;
 
-				if (selected) {
-					this.inputEl.value = option.label;
-				}
-			});
+        options.forEach((option) => {
+            const selected = (option.value === this.optionValue); // checks if the selected option is the current option
 
-			if (this.inputEl.value === '') {
-				this.inputEl.value = this.optionValue;
-			};
-		};
+			option.selected = selected // if so, set the option as selected by calling set selected from child fc-option, if not, remove selected attribute(query === label)
+			option.hidden = !selected // if so, show the option
+			option.active = false; // now it is needed to remove active status from all options when a option is selected
+
+            // if it is the selected one, update the visible Input Text to match this option's label
+            // this fixes the issue where the input might hold a "stale" label or raw value
+            if (selected) {
+                this.inputEl.value = option.label;
+                foundMatch = true;
+            }
+        });
+
+        if (!foundMatch && this.inputEl.value === '') {
+            this.inputEl.value = this.optionValue;
+        }
 	};
 
 	/* this is the function that runs whenever the press any keyboard key */
