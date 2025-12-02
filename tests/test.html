@@ -100,7 +100,19 @@
                     value: 'fruit-82' // calling value here will just set the initial value, it won't create an attribute value
                 });
 
-                cbFruits.addEventListener("fc-change", e => console.log(e.detail));         
+                cbFruits.addEventListener("fc-change", e => console.log(e.detail));       
+
+                // adding custom validator to fc input of id="username"
+                
+                const inputUsername = document.getElementById('username');
+
+                inputUsername.validator = (name) => {
+                    if (name.includes("batata")) {
+                        return "Username cannot include 'batata' as text."
+                    }
+                    return null;
+                }
+
             });
 
 

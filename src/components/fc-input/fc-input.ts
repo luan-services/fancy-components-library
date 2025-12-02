@@ -82,6 +82,12 @@ export class FcInput extends HTMLElement {
 
     /* this will store the <fc-input> value when calling the setter, for react compatibility */
     private _value: string = '';
+    
+    /* this will store user's custom validation function for <fc-input> (if exists) 
+    validatorFunction should have a logic that either returns a string (the error message) or null, if it returns null after
+    calculations, the input passed user's validation, if returns a string, it is an error.
+    */
+    private _validatorFunction: ((value: string) => string | null) | null = null;
 	
     // this signals the browser this custom element (<fc-combobox>) should participate in forms, allowing its value to be submitted along with the form data.
 	static formAssociated = true; 
@@ -256,6 +262,19 @@ export class FcInput extends HTMLElement {
 		
         this.removeAttribute('readonly');
 	}
+
+    /* getters and setters for user's the validator function */
+
+    public get validator() {
+        return this._validatorFunction;
+    }
+
+    public set validator(func: ((value: string) => string | null) | null) {
+        this._validatorFunction = func;
+        
+        // re-validate immediately when the logic changes, if the field is already filled, this will show/hide errors instantly.
+        this.syncValidity();
+    }
 
 	/* the getters and setters bellow are used to define validator attributes on <fc-input> that will be later 
     reflect on the child inputEl */
@@ -657,19 +676,35 @@ export class FcInput extends HTMLElement {
             return;
         }
 
-		// first check native inputEl validity
-		if (this.inputEl.validity.valid) { // if is valid, <fc-input> is valid
-			this.internals.setValidity({});
+        // first check native inputEl validity, if invalid, set the error and return
+        if (!this.inputEl.validity.valid) {
+            this.internals.setValidity(
+                this.inputEl.validity,
+                this.inputEl.validationMessage,
+                this.inputEl
+            );
             return;
-		} 
+        }
 
-        this.internals.setValidity(
-            this.inputEl.validity, 
-            this.inputEl.validationMessage, 
-            this.inputEl
-        );
+        // here is a second layer of validation, it validates based on user's function
+        if (this._validatorFunction) {
+            // run the user's function passing the current value, if it is null, the form is valid, if it is a string, form is invalid
+            const customErrorMessage = this._validatorFunction(this.value);
 
-        // later here we can set custom validators to set <fc-input> validity directly (a second layer of validation)
+            // if the function returns a string, set the erorr
+            if (customErrorMessage) {
+                this.internals.setValidity(
+                    { customError: true }, // mark as custom error
+                    customErrorMessage,    // set the message returned by the function
+                    this.inputEl           // bind the target element
+                );
+                return;
+            }
+        }
+    
+        // if both layers passed, it is a valid input:
+        this.internals.setValidity({});
+        return;
 	}
 
 
