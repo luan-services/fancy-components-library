@@ -112,7 +112,7 @@ export class FcCombobox extends HTMLElement {
 	/* this is the class constructor, whenever you create a new element on js or at the dom, this will be called */
 	constructor() {
 		super(); // calls HTMLElement class constructor too, after that, runs the following code V
-		const shadow = this.attachShadow({ mode: 'open' }); // creates a shadow DOM
+		const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true}); // creates a shadow DOM
 		shadow.appendChild(
 			template.content.cloneNode(true) // clone our html and css template and append it to the shadow DOM
 		); 
@@ -538,6 +538,12 @@ export class FcCombobox extends HTMLElement {
 		/* removes touched attribute and reset validity on form reset */
 		this.removeAttribute('touched'); 
         this.syncValidity();
+
+        /* dispatch an fc-reset event to let fc-error knows when the element status has been reseted by a form button */
+        this.dispatchEvent(new CustomEvent('fc-reset', { 
+            bubbles: true, 
+            composed: true 
+        }));
 	}
 
 	/* this runs whenever the user click on return on the page and them go back to the form page again,

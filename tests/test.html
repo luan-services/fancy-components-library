@@ -13,7 +13,7 @@
             <h2 class="h2">FC-Combobox:</h2>
 
             <form style="display: flex; gap: 16px; align-items: center;">
-                <fc-combobox value="country-1" placeholder="Search for a country..." name="country"> <!-- setting value here will create an attribute 'value' -->
+                <fc-combobox value="country-1" placeholder="Search for a country..." name="country" strict> <!-- setting value here will create an attribute 'value' -->
                     <fc-option value="country-1">France</fc-option>
                     <fc-option value="country-2">Japan</fc-option>
                     
@@ -38,7 +38,7 @@
 
             <fc-input minlength="3" maxlength="10" value="test" type="text" autcomplete="off"></fc-input>
             <fc-input placeholder="This is disabled..." type="text" disabled></fc-input>
-            <fc-input placeholder="Enter your email..." type="email"></fc-input>
+            <fc-input placeholder="Enter your email..." type="email" required></fc-input>
             <fc-input placeholder="Enter your password..." type="password"></fc-input>
             <fc-input placeholder="Enter a url..." type="url"></fc-input>
             <fc-input min="32" max="400" placeholder="Type a number..." type="number"></fc-input>
@@ -56,6 +56,20 @@
 
                 <fc-error for="email-field"></fc-error>
 
+                <button type="submit">Submit</button>
+                <button type="reset">Reset</button>
+            </form>
+
+            <form style="display: flex; gap: 16px; align-items: center;">
+                
+                <fc-combobox id="anime-field" placeholder="Search for an anime..." name="anime" required="true"> <!-- setting value here will create an attribute 'value' -->
+                    <fc-option value="anime-1">One Piece</fc-option>
+                    <fc-option value="anime-2">Naruto</fc-option>
+                    <fc-option value="anime-3">Bleach</fc-option>
+                </fc-combobox>
+
+                <fc-error for="anime-field"></fc-error>
+                
                 <button type="submit">Submit</button>
                 <button type="reset">Reset</button>
             </form>

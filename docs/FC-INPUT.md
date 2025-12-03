@@ -138,6 +138,14 @@ Fired when the value is committed (similar to the native `change` event).
   * **Trigger:** User blurs the field after editing.
   * **Detail:** `{ value: string, files: FileList | null }`
 
+  
+### `fc-change`
+
+Fired when 'formResetCallback' is launched. It is used mainly for `<fc-error>` to know the element was reset.
+
+  * **Trigger:** User clicks a reset button inside a form containing this element.
+  * **Detail:** `none`
+
 <!-- end list -->
 
 ```javascript

@@ -566,6 +566,12 @@ export class FcInput extends HTMLElement {
 		this.internals.setFormValue('');
 		this.syncValidity();
 		this.removeAttribute('touched'); // remove touched on reset
+
+        /* dispatch an fc-reset event to let fc-error knows when the element status has been reseted by a form button */
+        this.dispatchEvent(new CustomEvent('fc-reset', { 
+            bubbles: true, 
+            composed: true 
+        }));
 	}
 
 	/* this runs whenever the user click on return on the page and them go back to the form page again,

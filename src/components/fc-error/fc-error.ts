@@ -98,9 +98,12 @@ export class FcError extends HTMLElement {
         /* INVALID: the form was submitted (or checkValidity called), this forces the error to show even if the user never touched it. */
         this.targetEl.addEventListener('invalid', this.handleErrorState);
 
-        /* 3. INPUT: the user is typing, this is only needed to HIDE the error if the user fix it. there is no need to check 
+        /* INPUT: the user is typing, this is only needed to HIDE the error if the user fix it. there is no need to check 
         "touched" here, because if the error is currently visible, they effectively "touched" it already. */
         this.targetEl.addEventListener('input', this.handleErrorState);
+
+        /* RESET: listen to the element custom reset event that launches when a reset button is clicked */
+        this.targetEl.addEventListener('fc-reset', this.handleErrorState);
     }
 
     /* this is the cleanup helper function to remove all listeners and remove the target Element from the private attribute */
@@ -110,6 +113,7 @@ export class FcError extends HTMLElement {
             this.targetEl.removeEventListener('blur', this.handleErrorState);
             this.targetEl.removeEventListener('invalid', this.handleErrorState);
             this.targetEl.removeEventListener('input', this.handleErrorState);
+            this.targetEl.removeEventListener('fc-reset', this.handleErrorState);
             this.targetEl = null;
         }
     }
