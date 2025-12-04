@@ -2,6 +2,7 @@
 export const styles = `
 	:host {
 		display: block;
+		color-scheme: var(--fc-color-scheme);
 		width: 100%;
 		box-sizing: border-box;
     	font-family: var(--fc-font-family);
@@ -20,7 +21,7 @@ export const styles = `
 	internals.setValidity() logic. */
 
 	:host([touched]:invalid) .fc-input-field {
-		background-color: var(--fc-input-error-bg);
+		background: var(--fc-input-error-bg);
 		border-color: var(--fc-input-error-color);
 	}
 
@@ -102,7 +103,7 @@ export const styles = `
 	.fc-input-field::file-selector-button {
 		padding: 4px 10px;
 		border-radius: var(--fc-input-radius);
-		background-color: var(--fc-input-btn-bg);
+		background: var(--fc-input-btn-bg);
 		color: var(--fc-input-file-btn-fg);
 		border: 1px solid var(--fc-input-file-border);
 		cursor: pointer;
@@ -115,7 +116,7 @@ export const styles = `
 		margin-right: 12px;
 		padding: 4px 10px;
 		border-radius: var(--fc-input-radius);
-		background-color: var(--fc-input-file-btn-bg);
+		background: var(--fc-input-file-btn-bg);
 		color: var(--fc-input-file-btn-fg);
 		border: 1px solid var(--fc-input-file-border);
 		cursor: pointer;
@@ -126,12 +127,12 @@ export const styles = `
 	/* Hover effects for the button */
 
 	.fc-input-field::file-selector-button:hover {
-		background-color: var(--fc-input-file-btn-bg-hover); 
+		background: var(--fc-input-file-btn-bg-hover); 
 	}
 
 
 	.fc-input-field::-webkit-file-upload-button:hover {
-		background-color: var(--fc-input-file-btn-bg-hover);
+		background: var(--fc-input-file-btn-bg-hover);
 	}
 
 	/* PASSWORD type specific CSS */

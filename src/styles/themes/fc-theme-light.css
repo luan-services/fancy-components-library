@@ -1,4 +1,6 @@
 :root[fc-theme="light"] {
+    --fc-color-scheme: light !important;
+
 	/* fc-combobox component */
     --fc-combobox-bg: var(--fc-white);
     --fc-combobox-disabled-bg: var(--fc-gray-50);
