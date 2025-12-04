@@ -16,10 +16,10 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts", // let users import types by: import { Combobox } from 'fancy-ui-ts/index.d.ts';
-      "import": "./dist/index.js" // let users import components by: import { defineCombobox } from 'fancy-ui-ts';
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
-    "./styles.css": "./dist/index.css" // let users import style by: import 'fancy-ui-ts/styles.css'; 
+    "./styles.css": "./dist/index.css"
   },
   "scripts": {
     "dev": "vite",
