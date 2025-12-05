@@ -344,6 +344,14 @@ export class FcInput extends HTMLElement {
 		this.fcPassEnableIcon = this.shadowRoot!.querySelector('.icon-eye') as SVGElement;
 		this.fcPassDisableIcon = this.shadowRoot!.querySelector('.icon-eye-off') as SVGElement;
 
+		/* this component is considered a form part, it'll set this components '_value' as a formValue, so on the form you will see 
+		a field {name: 'fc-combobox name property', value: "fc-combobox value property"} if 'name' property is not set, browser is 
+		smart enought and won't set the  form field if it is the case  it will still have a formValue for the formRestore and formReset 
+		callbacks to work tho */
+		if (this.type !== 'file') { // if it has file type it shouldn't have a form value
+			this.internals.setFormValue(this._value);
+		}
+
         /* if the user did <fc-input type=""> and type is valid, set it on inputEl, else set as type="text" */
 		if (this.hasAttribute('type')) { 
             const type = this.getAttribute('type')!
@@ -416,14 +424,6 @@ export class FcInput extends HTMLElement {
 
 		if (this.type !== 'file') {
 			this.inputEl.value = this._value;
-		}
-
-		/* if 'name' exists, this component will be considered a form part, so it'll set the form 'value' property: <fc-input value="">, 
-		on the form you will see a field (name: 'fc-input name property', value: "fc-input value property")
-		but even if 'name' does not exists, it must have a formValue for the formRestore and formReset callbacks to work, browser is
-		smart enought and won't set the form field if it is the case  */
-		if (this.type !== 'file') {
-			this.internals.setFormValue(this._value);
 		}
 
         /*  adding event listeners to the child inputEl so we can emit CustomEvents */
