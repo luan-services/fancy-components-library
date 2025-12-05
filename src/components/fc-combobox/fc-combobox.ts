@@ -79,6 +79,35 @@ required, readonly and strict attributes are for validation
 
 */
 
+/* about acessibility 
+
+aria-describedby, aria-details, aria-labelledby: shouldn't be mapped down to the input, when set, the browser knows it is set on 
+the inner inputEl, thanks to delegatesFocus that passes the focus to it.
+    const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
+delegatesFocus: true ensures that whenever I click ANYWHERE inside <fc-input> the focus will be passed to the first child element of it,
+which means the focus will stay in <input> element. this is great for custom input web components.
+
+aria-label: same as above, but you can pass it down via observedAttributes if you want
+
+aria-invalid, aria-disabled, aria-required: whenever a state is set (by user or by inner logic), we should update form INTERNALS aria
+only, like: this.internals.ariaSomething = true
+
+other arias: other aria properties are added directly to the element template because they do not need to be custom and does not change 
+
+*/
+
+/* about delegatesFocus: true
+on <fc-combobox>, specifically, delegatesFocus: true has another role: 
+before adding it, whenever the user click inside the dropdown but not on an option, the browser would try to move the focus to 
+the div, it'd fail and the focus would go back to 'body', this way, onFocusout would be called, and since body is not inside 
+<fc-combobox> toggleDropdown would close the div.
+
+now, with delegate, focus, clicks inside the dropdown but not on an option will delegate the focus back to the input element inside
+<fc-combobox> (the first child element) preventing the onFocusOut to launch, that means, onDropdownClick listener is not needed anymore
+*/
+
+
+
 export class FcCombobox extends HTMLElement {
 	
 	/* this is a static method that tells the browser which atributes should be 'watched', that means whenever 'name' 
@@ -140,9 +169,6 @@ export class FcCombobox extends HTMLElement {
 		this.onOutsideClick = this.onOutsideClick.bind(this);
 		this.onFocusOut = this.onFocusOut.bind(this);
 		this.onFocus = this.onFocus.bind(this);
-
-		/* function to prevent focus going to the div dropdown on click inside it but not on options */
-		this.onDropdownClick = this.onDropdownClick.bind(this);
 
 		/* exclusive function for react see below */
 		this.onSlotChange = this.onSlotChange.bind(this);
@@ -374,18 +400,18 @@ export class FcCombobox extends HTMLElement {
 		this.inputEl = this.shadowRoot!.getElementById('fc-input') as HTMLInputElement;
 		this.dropdownEl = this.shadowRoot!.getElementById('fc-options') as HTMLElement;
 
+		/* this component is considered a form part, it'll set this components '_value' as a formValue, so on the form you will see 
+		a field {name: 'fc-combobox name property', value: "fc-combobox value property"} if 'name' property is not set, browser is 
+		smart enought and won't set the  form field if it is the case  it will still have a formValue for the formRestore and formReset 
+		callbacks to work tho */
+		this.internals.setFormValue(this.value); 
+
 		/* if the attributes below exists (if it was applied by the user (via js or directly with prop="")), apply the properties
 		to the respective children inside the shadow DOM */
 
 		if (this.hasAttribute('placeholder')) { // applying the placeholder text to the input
 			this.inputEl.placeholder = this.getAttribute('placeholder')!;
 		}
-
-		/* if 'name' exists, this component will be considered a form part, so it'll set the form 'value' property: <fc-combobox value="">, 
-		on the form you will see a field (name: 'fc-combobox name property', value: "fc-combobox value property")
-		but even if 'name' does not exists, it must have a formValue for the formRestore and formReset callbacks to work, browser is
-		smart enought and won't set the form field if it is the case  */
-		this.internals.setFormValue(this.value); 
 
 		if (this.hasAttribute('disabled')) {
 			/* applying 'disabled' to the input if <fc-combobox> has 'disabled*/
@@ -426,16 +452,6 @@ export class FcCombobox extends HTMLElement {
 
 		/* this listener is for when the user clicks on the input again (and it already had text) */
 		this.inputEl.addEventListener('focus', this.onFocus);
-
-		/* this listener is for when the user clicks on the dropdown, to prevent focusout to launch,
-			by default, when tabbing, the focus goes to focusable element inside our fc-combobox (the buttons inside options),
-			
-			the div is skipped because by default divs are elements that cannot hold focus (and they should not), the problem
-			is, if an user click (instead of tab), the browser will try to move the focus to the div, it'll fail and the
-			focus will go back to 'body', this way, focusout will be called, and since body is not inside <fc-combobox> toggleDropdown 
-			will be called 
-		*/
-		this.dropdownEl.addEventListener('mousedown', this.onDropdownClick);
 
 		this.inputEl.addEventListener('blur', this.onBlur);
 
@@ -597,6 +613,7 @@ export class FcCombobox extends HTMLElement {
 			this.inputEl.removeAttribute('aria-activedescendant');
 			this.toggleDropdown(true);
 			this.syncValidity();
+
 			this.dispatchEvent( // dispatch a new event for anything outside listen saying that the values are changed (to work with frameworks)
 				new CustomEvent('fc-input', 
 				{
@@ -720,11 +737,6 @@ export class FcCombobox extends HTMLElement {
 			this.toggleDropdown(false);
 		}
 	};
-
-	// prevent focus (trying to go) going to the <div> dropdown when click on it
-	private onDropdownClick(e: MouseEvent) {
-		e.preventDefault();
-	}
 
 	private onFocus(e: FocusEvent) {
 		// do not open if disabled

@@ -26,9 +26,11 @@ a string (the error message) it is an error, if they return 'null', the input is
 
 /* about acessibility 
 
-aria-describedby, aria-details, aria-labelledby: shouldn't be mapped down to the input, when set, the browser knows it is set on the
-inner inputEl, thanks to delegatesFocus that passes the focus to it.
+aria-describedby, aria-details, aria-labelledby: shouldn't be mapped down to the input, when set, the browser knows it is set on 
+the inner inputEl, thanks to delegatesFocus that passes the focus to it.
     const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
+delegatesFocus: true ensures that whenever I click ANYWHERE inside <fc-input> the focus will be passed to the first child element of it,
+which means the focus will stay in <input> element. this is great for custom input web components.
 
 aria-label: same as above, but you can pass it down via observedAttributes if you want
 
