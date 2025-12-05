@@ -1,6 +1,6 @@
 # FcInput Component Documentation
 
-`fc-input` is a robust, form-associated custom element (`HTMLElement`) that extends the native input functionality. It encapsulates styling, validation logic, accessibility features, and specific behaviors like password toggling, while maintaining compatibility with native forms and modern frameworks like React.
+`fc-input` is a form-associated custom element (`HTMLElement`) that extends the native input functionality. It encapsulates styling, validation logic, accessibility features, and specific behaviors like password toggling, while maintaining compatibility with native forms and modern frameworks like React.
 
 ## Key Features
 
@@ -22,7 +22,6 @@ To use the component, you must first register it. Prevents double-registration e
 ```javascript
 import { defineInput } from './index';
 
-// Registers <fc-input> in the browser
 defineInput();
 ```
 
@@ -65,12 +64,12 @@ The component uses Shadow DOM but exposes CSS variables for extensive customizat
 | `--fc-input-border-focus` | Border color on focus. |
 | `--fc-input-focus-ring` | Box shadow/Ring on focus. |
 | **Colors (Error State)** | |
-| `--fc-input-error-bg` | Background when invalid (and touched). |
-| `--fc-input-error-color` | Border color when invalid (and touched). |
-| `--fc-input-error-focus-ring`| Focus ring when invalid. |
+| `--fc-input-bg-error` | Background when invalid (and touched). |
+| `--fc-input-border-error` | Border color when invalid (and touched). |
+| `--fc-input-focus-ring-error`| Focus ring when invalid. |
 | **Colors (Disabled)** | |
-| `--fc-input-disabled-bg` | Background when disabled. |
-| `--fc-input-disabled-placeholder`| Placeholder color when disabled. |
+| `--fc-input-bg-disabled` | Background when disabled. |
+| `--fc-input-placeholder-disabled`| Placeholder color when disabled. |
 | **Special Types (File/Password)** | |
 | `--fc-input-file-border` | Border specific to file inputs. |
 | `--fc-input-btn-bg` | File selector button background. |
@@ -94,9 +93,9 @@ Most attributes are synchronized with their corresponding properties.
 | `disabled` | `disabled` | `boolean`| Disables the input and updates `aria-disabled`. |
 | `readonly` | `readonly` | `boolean`| Sets the field to read-only. |
 | `required` | `required` | `boolean`| Marks field as required and updates `aria-required`. |
-| `min` | `min` | `string` | Minimum value (for numbers). |
-| `max` | `max` | `string` | Maximum value (for numbers). |
-| `step` | `step` | `string` | Step interval (for numbers). |
+| `min` | `min` | `string` | Minimum value (for number type input). |
+| `max` | `max` | `string` | Maximum value (for number type input). |
+| `step` | `step` | `string` | Step interval (for number type input). |
 | `minlength` | `minLength` | `number` | Minimum character length. |
 | `maxlength` | `maxLength` | `number` | Maximum character length. |
 | `pattern` | `pattern` | `string` | Regex pattern for validation. |
@@ -139,7 +138,7 @@ Fired when the value is committed (similar to the native `change` event).
   * **Detail:** `{ value: string, files: FileList | null }`
 
   
-### `fc-change`
+### `fc-reset`
 
 Fired when 'formResetCallback' is launched. It is used mainly for `<fc-error>` to know the element was reset.
 
@@ -181,12 +180,14 @@ You can attach a custom validation function via JavaScript.
 ```javascript
 const myInput = document.querySelector('fc-input');
 
-// Logic: Return a string for error, null for valid
 myInput.validator = (value) => {
     if (value === 'admin') {
-        return 'That username is taken.'; // Sets custom validity error
+        return 'That username is taken.'; // This is string is the custom validity error
     }
-    return null; // Valid
+
+    // you can add more checks here
+
+    return null; // remember to return null if value passes all validations, this means it is valid
 };
 ```
 
