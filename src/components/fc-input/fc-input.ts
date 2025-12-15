@@ -107,9 +107,26 @@ export class FcInput extends HTMLElement {
 		const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true }); // creates a shadow DOM, delegate focus guarantee focus will be passed to inner inputEl and aria labels will work
 		shadow.appendChild(
             template.content.cloneNode(true) // clone our html and css template and append it to the shadow DOM
-        );
-		
+        );		
+
 		this.internals = this.attachInternals(); 
+
+        /* first of all, search for the elements inside the component and bind it to the respective property */
+		this.inputEl = this.shadowRoot!.querySelector('.fc-input-field') as HTMLInputElement;
+        this.passwordBtnEl = this.shadowRoot!.querySelector('.fc-password-toggle') as HTMLButtonElement;
+		this.fcPassEnableIcon = this.shadowRoot!.querySelector('.icon-eye') as SVGElement;
+		this.fcPassDisableIcon = this.shadowRoot!.querySelector('.icon-eye-off') as SVGElement;
+        
+		/* assigning random ids to the elements to prevent bugs if there is one or more ID */
+
+        const randomId = Math.random().toString(36).substring(2, 9);
+
+		const inputId = `fc-input-${randomId}`;
+		const passwordBtnId = `fc-pass-btn-${randomId}`;
+
+		this.inputEl.id = inputId;
+		this.passwordBtnEl.id = passwordBtnId;
+        this.passwordBtnEl.setAttribute('aria-controls', inputId);
 
         /* binding all functions (from listeners) to the current instance of this component */
 		this.onInput = this.onInput.bind(this);
@@ -340,11 +357,6 @@ export class FcInput extends HTMLElement {
 	/* this is the function that will be called when the element is inserted in the DOM */
 
 	connectedCallback() {
-        /* first of all, search for the elements inside the component and bind it to the respective property */
-		this.inputEl = this.shadowRoot!.getElementById('fc-field') as HTMLInputElement;
-        this.passwordBtnEl = this.shadowRoot!.getElementById('btn-show-pass') as HTMLButtonElement;
-		this.fcPassEnableIcon = this.shadowRoot!.querySelector('.icon-eye') as SVGElement;
-		this.fcPassDisableIcon = this.shadowRoot!.querySelector('.icon-eye-off') as SVGElement;
 
 		/* this component is considered a form part, it'll set this components '_value' as a formValue, so on the form you will see 
 		a field {name: 'fc-combobox name property', value: "fc-combobox value property"} if 'name' property is not set, browser is 

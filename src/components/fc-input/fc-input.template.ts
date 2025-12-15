@@ -10,7 +10,6 @@ template.innerHTML = `
 		<!-- prefix slot here -->
 		
 		<input 
-			id="fc-field" 
 			class="fc-input-field" 
 			part="input"
 			type="text"
@@ -18,7 +17,6 @@ template.innerHTML = `
 
 		<!-- password toggle button -->
 		<button 
-			id="btn-show-pass" 
 			class="fc-password-toggle" 
 			part="password-toggle" 
 			type="button" 

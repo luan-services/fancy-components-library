@@ -149,6 +149,21 @@ export class FcCombobox extends HTMLElement {
 		// attatch iternals functions to the reference to use the form control features with 'this.internals.*'
 		this.internals = this.attachInternals(); 
 
+		/* search for the elements inside shadowDOM by class and assign them to their properties */
+		this.inputEl = shadow.querySelector('.fc-input') as HTMLInputElement;
+        this.dropdownEl = shadow.querySelector('.fc-options') as HTMLElement;
+
+		/* assigning random ids to the elements to prevent bugs if there is one or more ID */
+
+		const randomId = Math.random().toString(36).substring(2, 9);
+
+		const inputId = `fc-input-${randomId}`;
+		const dropdownId = `fc-options-${randomId}`;
+
+		this.inputEl.id = inputId;
+		this.dropdownEl.id = dropdownId;
+		this.inputEl.setAttribute('aria-controls', dropdownId);
+
 		/* about 'bind(this)':
 		o .bind(this) "amarra" o contexto. Ele garante que, quando a funcao onInput rodar, o this na função onInput continue sendo a 
 		instância da classe FcComboBox (o elemento <fc-combobox>), sem isso, o 'this' lá dentro estaria se 
@@ -396,9 +411,6 @@ export class FcCombobox extends HTMLElement {
 	/* this is the function that will be called when the element is inserted in the DOM */
 
 	connectedCallback() {
-		// first of all, search for the elements inside the component
-		this.inputEl = this.shadowRoot!.getElementById('fc-input') as HTMLInputElement;
-		this.dropdownEl = this.shadowRoot!.getElementById('fc-options') as HTMLElement;
 
 		/* this component is considered a form part, it'll set this components '_value' as a formValue, so on the form you will see 
 		a field {name: 'fc-combobox name property', value: "fc-combobox value property"} if 'name' property is not set, browser is 

@@ -6,11 +6,13 @@ export const template = document.createElement('template'); // create a new comp
    file, if a user do .fc-label it wont work, they need to do .fc-label::part(label) 
 */
 
+/* both input and div must have unique ids, but we cant add directly here, because if the user wants more than one element, it will
+get in conflict, we'll be removing the id from here and passing it on the class. */
+
 template.innerHTML = `
 	<style>${styles}</style>
 
 	<input 
-		id="fc-input" 
 		class="fc-input"
 		type="text" 
 		role="combobox"
@@ -23,7 +25,6 @@ template.innerHTML = `
 	/>
 
 	<div 
-		id="fc-options" 
 		part="options" 
 		class="fc-options" 
 		role="listbox"
