@@ -26,6 +26,20 @@
     "build": "tsup",
     "build:watch": "tsup --watch"
   },
+  "keywords": [
+    "web-components",
+    "components",
+    "custom-elements",
+    "typescript",
+    "ui-library",
+    "design-system",
+    "combobox",
+    "input",
+    "label",
+    "html",
+    "react",
+    "vue"
+  ],
   "author": "Luan Peixoto",
   "license": "MIT",
   "devDependencies": {
