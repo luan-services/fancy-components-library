@@ -774,6 +774,9 @@ export class FcCombobox extends HTMLElement {
 			return;
 		}
 
+		/* all the logic below cannot be added to the value setter because when the setter runs, the properties on each FcOption
+		are not synced yet, causing bugs on the component, we should handle the selection and hiding of the FcOption elements here
+		(when everything is already ready) (this is a standart practice for components inside slots) */
         const options = this.querySelectorAll('fc-option') as NodeListOf<FcOption>;
         let foundMatch = false;
 
