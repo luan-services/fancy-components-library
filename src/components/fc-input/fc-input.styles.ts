@@ -174,8 +174,8 @@ export const styles = `
 	}
 	
 	.fc-password-toggle svg {
-		width: 20px;
-		height: 20px;
+		width: var(--fc-input-password-icon-width);
+		height: var(--fc-input-password-icon-height);
 	}
 
 	.fc-password-toggle svg[hidden] {

@@ -36,10 +36,11 @@ export const styles = `
 
 	.fc-option-text {
         flex-grow: 1;
+		font-size: var(--fc-font-size-md);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin-right: 12px; /* Spacing between text and checkmark */
+        margin-right: 12px;
     }
 
     .fc-option-icon {
@@ -50,8 +51,8 @@ export const styles = `
     }
 	
 	.fc-option-icon svg {
-		width: 20px;
-		height: 20px;
+		width: var(--fc-option-icon-width);
+		height: var(--fc-option-icon-height);
     }
 
 	button.fc-option:hover {

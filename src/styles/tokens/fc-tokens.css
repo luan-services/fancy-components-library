@@ -32,6 +32,8 @@
     --fc-option-fg-disabled: var(--fc-gray-300);
     --fc-option-padding: var(--fc-space-3);
     --fc-option-radius: var(--fc-radius-md);
+    --fc-option-icon-width: calc(var(--fc-font-size-md) + 1px);
+    --fc-option-icon-height: calc(var(--fc-font-size-md) + 1px);
 
     /* fc-input component */
     --fc-input-bg: var(--fc-white);
@@ -50,6 +52,8 @@
 
     --fc-input-password-icon-color: var(--fc-gray-400);
     --fc-input-password-icon-color-hover: var(--fc-gray-500);
+    --fc-input-password-icon-width: calc(var(--fc-font-size-md) + 2px);
+    --fc-input-password-icon-height: calc(var(--fc-font-size-md) + 2px);
 
     --fc-input-file-border: var(--fc-gray-400);
     --fc-input-file-border-hover: var(--fc-gray-400);
@@ -74,4 +78,8 @@
     --fc-label-font-size: var(--fc-font-size-md);
     --fc-label-font-weight: var(--fc-font-weight-bold);
     --fc-label-fg: var(--fc-gray-900);
+
+    /* fc-select component */
+    --fc-select-dropdown-icon-width: calc(var(--fc-font-size-md) + 4px);
+    --fc-select-dropdown-icon-height: calc(var(--fc-font-size-md) + 4px);
 }
