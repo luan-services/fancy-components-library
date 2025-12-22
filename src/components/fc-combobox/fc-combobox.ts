@@ -437,10 +437,6 @@ export class FcCombobox extends HTMLElement {
 		*/
 		this.addEventListener('fc-option-select', this.onOptionSelect as EventListener);
 
-		/* this listener is for when the user clicks outside the input so the dropdown can close this is a DOM event 
-		listener, so it must be cleaned onDisconnectCallback (when the element is removed from the dom) to prevent memory leak */
-		document.addEventListener('click', this.onOutsideClick as EventListener);
-
 		/* this listener is for when the user clicks outside the input so the dropdown can close  */
 		this.addEventListener('focusout', this.onFocusOut as EventListener);
 
@@ -745,7 +741,9 @@ export class FcCombobox extends HTMLElement {
 	}
 
 	private onFocusOut(e: FocusEvent) { // If the newly-focused element is outside the component, close
-		if (!this.contains(e.relatedTarget as Node)) {
+		const target = e.relatedTarget as Node;
+
+		if (!target || !this.contains(target)) {
 			this.toggleDropdown(false);
 		}
 	};
@@ -799,7 +797,6 @@ export class FcCombobox extends HTMLElement {
         if (!foundMatch && this.inputEl.value === '') {
             this.inputEl.value = this._value;
 			options.forEach((option) => {
-				console.log(option.value)
 				const match = option.label.toLowerCase().includes((this._value).toLowerCase()); // checks if the selected option is the current option
 				option.hidden = !match // if so, show the option
 			});	
@@ -917,6 +914,7 @@ export class FcCombobox extends HTMLElement {
     }
 
 	private toggleDropdown(show: boolean) {
+
 		if (!this.dropdownEl) {
 			return;
 		};
@@ -940,8 +938,17 @@ export class FcCombobox extends HTMLElement {
 			const shouldOpenUp = (spaceBelow < dropdown.clientHeight) && (spaceAbove > spaceBelow);
 			dropdown.classList.toggle('opens-up', shouldOpenUp);
 
+			/* this listener is for when the user clicks outside the input so the dropdown can close this is a DOM event 
+			listener, so it must be cleaned onDisconnectCallback (when the element is removed from the dom) to prevent memory leak */
+			setTimeout(() => {
+				document.addEventListener('click', this.onOutsideClick);
+			}, 0);
+
 			return;
 		}
+
+		/* remove listener on close */
+		document.removeEventListener('click', this.onOutsideClick);
 
 		this.dropdownEl.hidden = true;
 		this.removeAttribute('open');
