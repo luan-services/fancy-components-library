@@ -9,6 +9,7 @@ import { FcOption, defineOption } from "./components/fc-option/index";
 import { FcInput, defineInput } from "./components/fc-input";
 import { FcError, defineError } from "./components/fc-error";
 import {FcLabel, defineLabel } from "./components/fc-label";
+import { FcSelect, defineSelect } from "./components/fc-select";
 
 export { 
     FcCombobox, // these are the types that are being exported so the users can use it on TypeScript
@@ -20,7 +21,9 @@ export {
     FcError,
     defineError,
     FcLabel,
-    defineLabel
+    defineLabel,
+    FcSelect,
+    defineSelect
 }
 
 export const defineAll = () => {
@@ -29,4 +32,5 @@ export const defineAll = () => {
     defineInput();
     defineError();
     defineLabel();
+    defineSelect();
 }
