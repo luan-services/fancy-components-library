@@ -496,7 +496,7 @@ export class FcCombobox extends HTMLElement {
 			this.internals.ariaDisabled = isDisabled ? 'true' : 'false';
 			// if we are disabling ensure the dropdown closes
 			if (isDisabled) {
-				this.toggleDropdown(false);
+				this.hideDropdown();
 			}
 		}
 
@@ -544,7 +544,7 @@ export class FcCombobox extends HTMLElement {
 			option.hidden = false;
 		});
 
-		this.toggleDropdown(false);
+		this.hideDropdown();
 
 		/* removes touched attribute and reset validity on form reset */
 		this.removeAttribute('touched'); 
@@ -619,7 +619,7 @@ export class FcCombobox extends HTMLElement {
 			this._value = '';
 			this.internals.setFormValue(''); 
 			this.inputEl.removeAttribute('aria-activedescendant');
-			this.toggleDropdown(true);
+			this.showDropdown();
 			this.syncValidity();
 
 			this.dispatchEvent( // dispatch a new event for anything outside listen saying that the values are changed (to work with frameworks)
@@ -684,7 +684,7 @@ export class FcCombobox extends HTMLElement {
 		));
 
 		// toggles dropdown if match - true and the options quantity > 0
-		this.toggleDropdown(hasMatch);
+		hasMatch ? this.showDropdown() : this.hideDropdown();
 	}
 	
 	private onChange(e: Event) {
@@ -723,7 +723,7 @@ export class FcCombobox extends HTMLElement {
 			option.active = false; // now it is needed to remove active status from all options when a option is selected
         });
 
-		this.toggleDropdown(false); // close dropdown
+		this.hideDropdown(); // close dropdown
 		this.syncValidity();
 		this.dispatchEvent( // dispatch a new event for anything outside listen saying that the values are changed (to work with frameworks)
 			new CustomEvent('fc-change', {
@@ -736,7 +736,7 @@ export class FcCombobox extends HTMLElement {
 
 	private onOutsideClick(e: MouseEvent) { // will check whether the click was outside or inside the component, to close the dropdown
 		if (!this.contains(e.target as Node)) {
-			this.toggleDropdown(false);
+			this.hideDropdown();
 		}
 	}
 
@@ -744,7 +744,7 @@ export class FcCombobox extends HTMLElement {
 		const target = e.relatedTarget as Node;
 
 		if (!target || !this.contains(target)) {
-			this.toggleDropdown(false);
+			this.hideDropdown();
 		}
 	};
 
@@ -762,7 +762,7 @@ export class FcCombobox extends HTMLElement {
 			return label.includes(query);
 		});
 
-		this.toggleDropdown(match);
+		match ? this.showDropdown() : this.hideDropdown();
 	};
 
 	// specific function for react to ensure <fc-combobox> value property will be correctly added to the <fc-option> that was added later
@@ -825,7 +825,7 @@ export class FcCombobox extends HTMLElement {
 
         if (e.key === 'ArrowDown') {
             e.preventDefault(); 
-            this.toggleDropdown(true); 
+            this.showDropdown(); 
             
             // if at end (length - 1), go to 0. else, go next
             const nextIndex = this.activeIndex >= visibleOptions.length - 1 ? 0 : this.activeIndex + 1;
@@ -833,7 +833,7 @@ export class FcCombobox extends HTMLElement {
         } 
         else if (e.key === 'ArrowUp') {
             e.preventDefault();
-            this.toggleDropdown(true);
+            this.showDropdown();
 
             // if at start (0) or no selection (-1), go to end. else, go prev
             const prevIndex = this.activeIndex <= 0 ? visibleOptions.length - 1 : this.activeIndex - 1;
@@ -856,7 +856,7 @@ export class FcCombobox extends HTMLElement {
                     option.active = false; // clear active state on select
                 });
 
-                this.toggleDropdown(false);
+                this.hideDropdown();
                 this.syncValidity();
                 this.dispatchEvent(
                     new CustomEvent('fc-change', {
@@ -869,10 +869,10 @@ export class FcCombobox extends HTMLElement {
         } 
         else if (e.key === 'Escape') {
             e.preventDefault();
-            this.toggleDropdown(false);
+            this.hideDropdown();
         }
         else if (e.key === 'Tab') {
-            this.toggleDropdown(false);
+            this.hideDropdown();
         }
     }
 
@@ -918,53 +918,52 @@ export class FcCombobox extends HTMLElement {
         this.inputEl.removeAttribute('aria-activedescendant');
     }
 
-	private toggleDropdown(show: boolean) {
-
-		if (!this.dropdownEl) {
+	private showDropdown() {
+		if (!this.dropdownEl || this.disabled) {
 			return;
 		};
 
-		if (this.disabled && show) { // prevents dropdown toggle if <fc-combobox> has 'disabled' attribute
-			return;
-		}
-
 		const dropdown = this.dropdownEl;
-		// if it should be open
-		if (show) {
 
-			/*custom event dispatch when dropdown is open (for developer experience) */
-			const showEvent = new CustomEvent('fc-show', {
-				bubbles: true,
-				composed: true,
-				cancelable: true // Allows user to call e.preventDefault() to stop opening
-			});
-			
-			this.dispatchEvent(showEvent);
+		/*custom event dispatch when dropdown is open (for developer experience) */
+		const showEvent = new CustomEvent('fc-show', {
+			bubbles: true,
+			composed: true,
+			cancelable: true // Allows user to call e.preventDefault() to stop opening
+		});
+		
+		this.dispatchEvent(showEvent);
 
-			/* let's user cancel the drodpown opening by cancelling the event */
-			if (showEvent.defaultPrevented) {
-				return;
-			}
-
-			/* calculates available space for dropdown */
-			const spaceBelow = calculateBottomAvaliableSpace(this.inputEl);
-			const spaceAbove = calculateTopAvaliableSpace(this.inputEl);
-			dropdown.hidden = false;
-			this.setAttribute('open', 'true');
-			this.inputEl.setAttribute("aria-expanded", "true");
-
-			/* if bottom space is not enought for dropdown size AND top space has more space, opens to top */
-			const shouldOpenUp = (spaceBelow < dropdown.clientHeight) && (spaceAbove > spaceBelow);
-			dropdown.classList.toggle('opens-up', shouldOpenUp);
-
-			/* this listener is for when the user clicks outside the input so the dropdown can close this is a DOM event 
-			listener, so it must be cleaned onDisconnectCallback (when the element is removed from the dom) to prevent memory leak */
-			setTimeout(() => {
-				document.addEventListener('click', this.onOutsideClick);
-			}, 0);
-
+		/* let's user cancel the drodpown opening by cancelling the event */
+		if (showEvent.defaultPrevented) {
 			return;
 		}
+
+		/* calculates available space for dropdown */
+		const spaceBelow = calculateBottomAvaliableSpace(this.inputEl);
+		const spaceAbove = calculateTopAvaliableSpace(this.inputEl);
+		dropdown.hidden = false;
+		this.setAttribute('open', 'true');
+		this.inputEl.setAttribute("aria-expanded", "true");
+
+		/* if bottom space is not enought for dropdown size AND top space has more space, opens to top */
+		const shouldOpenUp = (spaceBelow < dropdown.clientHeight) && (spaceAbove > spaceBelow);
+		dropdown.classList.toggle('opens-up', shouldOpenUp);
+
+		/* this listener is for when the user clicks outside the input so the dropdown can close this is a DOM event 
+		listener, so it must be cleaned onDisconnectCallback (when the element is removed from the dom) to prevent memory leak */
+		setTimeout(() => {
+			document.addEventListener('click', this.onOutsideClick);
+		}, 0);
+
+		return;
+
+	}
+
+	private hideDropdown() {
+		if (!this.dropdownEl) {
+			return;
+		};
 
 		/* dispatch dropdown close event if it was actually open (for developer experience) */
 		if (!this.dropdownEl.hidden) {
@@ -986,7 +985,6 @@ export class FcCombobox extends HTMLElement {
         this.querySelectorAll('fc-option').forEach(opt => (opt as FcOption).active = false);
 		// remove the active option id from aria-activedescendant attribute
 		this.inputEl.removeAttribute('aria-activedescendant');
-
 	}
 
 	private syncValidity() {
