@@ -1,6 +1,6 @@
 {
   "name": "fancy-ui-ts",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "type": "module",
   "description": "A library to easily create cool and customizable webcomponents.",
   "main": "dist/index.js",
