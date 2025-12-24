@@ -44,3 +44,7 @@
 ### Version 1.3.2 (Bug Fix)
 
 - Adding missing validatorFunction getter and setter on <fc-select>
+
+### Version 1.3.3 (Bug Fix)
+
+- Adding missing CSS styles for errors on <fc-select>

@@ -73,4 +73,9 @@
     --fc-select-placeholder: var(--fc-gray-500);
     --fc-select-placeholder-disabled: var(--fc-gray-700);
     --fc-select-focus-ring: var(--fc-focus-ring-sm) var(--fc-focus-ring-secondary);
+
+    --fc-select-bg-error: var(--fc-danger-900);
+	--fc-select-border-error: var(--fc-danger-700);
+    --fc-select-focus-ring-error: var(--fc-focus-ring-danger-secondary);
+
 }

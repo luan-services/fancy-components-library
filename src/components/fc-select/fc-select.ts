@@ -588,12 +588,12 @@ export class FcSelect extends HTMLElement {
 
         // first check native inputEl validity, if invalid, set the error and return
         if (!this.inputEl.validity.valid) {
-                this.internals.setValidity(
-                    this.inputEl.validity,
-                    this.inputEl.validationMessage,
-                    this.inputEl
-                );
-                return;
+            this.internals.setValidity(
+                this.inputEl.validity,
+                this.inputEl.validationMessage,
+                this.inputEl
+            );
+            return;
         }
 
         const options = this.querySelectorAll('fc-option') as NodeListOf<FcOption>;
@@ -603,7 +603,7 @@ export class FcSelect extends HTMLElement {
         if (this._validatorFunction) {
             // run the user's function passing the current value, if it is null, the form is valid, if it is a string, form is invalid
             const customErrorMessage = this._validatorFunction(this.value);
-
+            
             // if the function returns a string, set the erorr
             if (customErrorMessage) {
                 this.internals.setValidity(

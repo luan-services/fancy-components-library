@@ -9,16 +9,6 @@
 	</head>
 	<body>
         <h1 class="h1">Fancy UI HTML Test Sheet</h1>
-
-        <div class="container">
-            <h2 class="h2">FC-Select:</h2>
-            <fc-select placeholder="Select a restaurant...">
-                    <fc-option value="fastfood-1">McDonalds</fc-option>
-                    <fc-option value="fastfood-2">Subway</fc-option>
-                    <fc-option value="fastfood-3" disabled="true">Burger King</fc-option>
-                    <fc-option value="fastfood-4">Domino's</fc-option>
-            </fc-select>
-        </div>
         
         <div class="container">
             <h2 class="h2">FC-Combobox:</h2>
@@ -92,6 +82,17 @@
             <fc-error for="author"></fc-error>
         </div>
 
+        <div class="container">
+            <h2 class="h2">FC-Select:</h2>
+            <fc-select id="restaurants" placeholder="Select a restaurant...">
+                    <fc-option value="fastfood-1">McDonalds</fc-option>
+                    <fc-option value="fastfood-2">Subway</fc-option>
+                    <fc-option value="fastfood-3" disabled="true">Burger King</fc-option>
+                    <fc-option value="fastfood-4">Domino's</fc-option>
+            </fc-select>
+            <fc-error for="restaurants"></fc-error>
+        </div>
+
 
 
         <script type="module">
@@ -161,6 +162,17 @@
                     return null;
                 }
 
+                // adding custom validator to fc-selec of id="restaunrats"
+
+                const restSelect = document.getElementById('restaurants');
+
+                
+                restSelect.validator = (value) => {
+                    if (value.includes("fastfood-2")) {
+                        return "Custom constraint: Cannot select Subway, it is very bad"
+                    }
+                    return null;
+                }
             });
 
 
