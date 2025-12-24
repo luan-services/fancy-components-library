@@ -5,7 +5,7 @@ export const styles = `
         width: 100%;
         box-sizing: border-box;
         font-family: var(--fc-font-family);
-        max-width: var(--fc-combobox-max-width);
+        max-width: var(--fc-select-max-width);
         cursor: pointer; 
     }
 
@@ -13,15 +13,14 @@ export const styles = `
     .fc-input {
         width: 100%;
         box-sizing: border-box;
-        padding: var(--fc-combobox-padding);
-        padding-right: 36px;
-        
-        border-radius: var(--fc-combobox-radius);
-        background: var(--fc-combobox-bg);
-        color: var(--fc-combobox-fg);
-        border: var(--fc-combobox-border-width) solid var(--fc-combobox-border);
+        padding: var(--fc-select-padding);
+        padding-right: 36px; /* space for dropdown icon */
+        border-radius: var(--fc-select-radius);
+        background: var(--fc-select-bg);
+        color: var(--fc-select-fg);
+        border: var(--fc-select-border-width) solid var(--fc-select-border);
         font-size: var(--fc-font-size-md);
-        box-shadow: var(--fc-combobox-shadow);
+        box-shadow: var(--fc-select-shadow);
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         
         cursor: pointer; 
@@ -31,26 +30,26 @@ export const styles = `
 
     
     :host([touched]:invalid) .fc-input {
-        background-color: var(--fc-combobox-bg-error);
-        border-color: var(--fc-combobox-border-error);
+        background-color: var(--fc-select-bg-error);
+        border-color: var(--fc-select-border-error);
     }
 
     :host([touched]:invalid) .fc-input:focus {
-        box-shadow: 0 0 0 2px var(--fc-combobox-focus-ring-error);
+        box-shadow: 0 0 0 2px var(--fc-select-focus-ring-error);
     }
 
     .fc-input::placeholder {
-        color: var(--fc-combobox-placeholder);
+        color: var(--fc-select-placeholder);
     }
 
     .fc-input:hover {
-        border-color: var(--fc-combobox-border-hover);
+        border-color: var(--fc-select-border-hover);
     }
 
     .fc-input:focus {
-        border-color: var(--fc-combobox-border-focus);
+        border-color: var(--fc-select-border-focus);
         outline: none;
-        box-shadow: var(--fc-combobox-focus-ring);
+        box-shadow: var(--fc-select-focus-ring);
     }
 
     
@@ -62,7 +61,7 @@ export const styles = `
         width: var(--fc-select-dropdown-icon-width);
         height: var(--fc-select-dropdown-icon-height);
         pointer-events: none;
-        color: var(--fc-combobox-fg);
+        color: var(--fc-select-fg);
         transition: transform 0.2s ease;
     }
 
@@ -76,14 +75,14 @@ export const styles = `
     }
 
     .fc-input:disabled {
-        background: var(--fc-combobox-bg-disabled);
+        background: var(--fc-select-bg-disabled);
         cursor: not-allowed;
         box-shadow: none;
-        color: var(--fc-combobox-placeholder-disabled);
+        color: var(--fc-select-placeholder-disabled);
     }
 
     :host([disabled]) .fc-chevron {
-        color: var(--fc-combobox-placeholder-disabled);
+        color: var(--fc-select-placeholder-disabled);
     }
 
     .fc-options {
@@ -92,12 +91,12 @@ export const styles = `
         left: 0;
         right: 0;
         z-index: 1000;
-        background: var(--fc-combobox-dropdown-bg, var(--fc-combobox-bg));
-        border: var(--fc-combobox-border-width) solid var(--fc-combobox-border);
-        border-radius: var(--fc-combobox-dropdown-radius, var(--fc-combobox-radius));
-        padding: var(--fc-combobox-dropdown-padding, calc(var(--fc-combobox-padding) - 5px));
-        box-shadow: var(--fc-combobox-dropdown-shadow);
-        max-height: var(--fc-combobox-dropdown-max-height, 240px);
+        background: var(--fc-select-dropdown-bg, var(--fc-select-bg));
+        border: var(--fc-select-border-width) solid var(--fc-select-border);
+        border-radius: var(--fc-select-dropdown-radius, var(--fc-select-radius));
+        padding: var(--fc-select-dropdown-padding, calc(var(--fc-select-padding) - 5px));
+        box-shadow: var(--fc-select-dropdown-shadow);
+        max-height: var(--fc-select-dropdown-max-height, 240px);
         overflow-y: auto;
         box-sizing: border-box;
         display: flex;

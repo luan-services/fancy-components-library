@@ -62,4 +62,15 @@
     --fc-label-font-size: var(--fc-font-size-md);
     --fc-label-font-weight: var(--fc-font-weight-bold);
     --fc-label-fg: var(--fc-gray-200);
+
+    /* fc-select component */
+	--fc-select-bg: var(--fc-gray-800);
+    --fc-select-bg-disabled: var(--fc-gray-900);
+	--fc-select-fg: var(--fc-gray-200);
+	--fc-select-border: var(--fc-gray-700);
+    --fc-select-border-hover: var(--fc-gray-500);
+    --fc-select-border-focus: var(--fc-primary-400);
+    --fc-select-placeholder: var(--fc-gray-500);
+    --fc-select-placeholder-disabled: var(--fc-gray-700);
+    --fc-select-focus-ring: var(--fc-focus-ring-sm) var(--fc-focus-ring-secondary);
 }

@@ -80,6 +80,27 @@
     --fc-label-fg: var(--fc-gray-900);
 
     /* fc-select component */
+    --fc-select-bg: var(--fc-white);
+    --fc-select-bg-disabled: var(--fc-gray-50);
+    --fc-select-fg: var(--fc-gray-900);
+    --fc-select-border: var(--fc-gray-300);
+    --fc-select-border-hover: var(--fc-gray-400);
+    --fc-select-border-focus: var(--fc-primary-400);
+    --fc-select-placeholder: var(--fc-gray-400);
+    --fc-select-placeholder-disabled: var(--fc-gray-300);
+    --fc-select-focus-ring: var(--fc-focus-ring-sm) var(--fc-focus-ring-primary);
+
+    --fc-select-bg-error: var(--fc-danger-50);
+	--fc-select-border-error: var(--fc-danger-300);
+    --fc-select-focus-ring-error: var(--fc-focus-ring-danger);
+
     --fc-select-dropdown-icon-width: calc(var(--fc-font-size-md) + 4px);
     --fc-select-dropdown-icon-height: calc(var(--fc-font-size-md) + 4px);
+
+    --fc-select-max-width: 412px;
+    --fc-select-padding: var(--fc-space-3);
+    --fc-select-border-width: var(--fc-border-width-xs);
+    --fc-select-radius: var(--fc-radius-md);
+    --fc-select-shadow: var(--fc-shadow-none);
+
 }
