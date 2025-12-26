@@ -29,7 +29,11 @@ export class FcSelect extends HTMLElement {
     // tracks the current index of the active option (for keyboard navivation)
     private activeIndex: number = -1;
 
+
+    /* save the user input for type-ahead search */
     private searchBuffer: string = '';
+
+    /* references the timeout function used as a buffer for type-ahead logic */
     private searchTimeout: any = null;
 
     /* this will store a reference to user's custom validation function when set */
@@ -498,9 +502,9 @@ export class FcSelect extends HTMLElement {
             return;
         }
 
+        /* if dropdown is closed, opens it on ArrowDown or ArrowUp */
         if (e.key === 'ArrowDown') {
             e.preventDefault(); 
-            // If closed, open it on Arrow Down
             if (this.dropdownEl.hidden) {
                 this.showDropdown();
                 return;
@@ -524,16 +528,19 @@ export class FcSelect extends HTMLElement {
             
             e.preventDefault(); 
 
-            if (this.dropdownEl.hidden) {
+            if (this.dropdownEl.hidden) { 
                 this.showDropdown();
-            } else {
-                if (this.activeIndex > -1 && options[this.activeIndex]) {
-                    const target = options[this.activeIndex];
-                    this.selectOption(target);
-                } else {
-                    this.hideDropdown();
-                }
+                return;
+            } 
+        
+            if (this.activeIndex > -1 && options[this.activeIndex]) {
+                const target = options[this.activeIndex];
+                this.selectOption(target);
+                return;
             }
+
+            this.hideDropdown();
+        
         } 
         else if (e.key === 'Escape') {
             e.preventDefault();
@@ -543,40 +550,40 @@ export class FcSelect extends HTMLElement {
             this.hideDropdown();
         }
 
-        // type-ahead Logic
+        /* type-ahead Logic */
         else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
             e.preventDefault();
-            this.handleTypeAhead(e.key);
-        }
-    }
 
-    /* helper functions */
+            const char = e.key;
 
-    private handleTypeAhead(char: string) {
-        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+            /* if there is already a timeout, clean it and restart */
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
 
-        this.searchBuffer += char.toLowerCase();
+            /* add a new char to the buffer */
+            this.searchBuffer += char.toLowerCase();
 
-        this.searchTimeout = setTimeout(() => {
-            this.searchBuffer = '';
-        }, 500);
-
-        const options = Array.from(this.querySelectorAll('fc-option')).filter(
-            opt => !(opt as FcOption).disabled
-        ) as FcOption[];
-        
-        const matchIndex = options.findIndex(opt => {
-            const label = (opt.getAttribute('label') || opt.textContent || '').toLowerCase();
-            return label.startsWith(this.searchBuffer);
-        });
-
-        if (matchIndex !== -1) {
-            const match = options[matchIndex];
+            /* makes a new timeout, if the user wait long enough, this timeout will clean the search buffer */
+            this.searchTimeout = setTimeout(() => {
+                this.searchBuffer = '';
+            }, 500);
             
-            if (!this.dropdownEl.hidden) {
-                this.setActiveOption(matchIndex, options);
-            } else {
+            const matchIndex = options.findIndex(opt => {
+                const label = (opt.getAttribute('label') || opt.textContent || '').toLowerCase();
+                return label.startsWith(this.searchBuffer);
+            });
+
+            /* if there is any matching option */
+            if (matchIndex !== -1) {
+                const match = options[matchIndex];
                 
+                /* if the dropdown is open, highlight the option */
+                if (!this.dropdownEl.hidden) {
+                    this.setActiveOption(matchIndex, options);
+                    return;
+                }
+                /* if it is closed, select the option */
                 this.selectOption(match);
             }
         }
@@ -600,6 +607,8 @@ export class FcSelect extends HTMLElement {
 			detail: { originalEvent: e }
 		}));
     }
+
+    /* helper functions */
 
     private setActiveOption(index: number, visibleOptions: FcOption[]) {
         this.querySelectorAll('fc-option').forEach(opt => (opt as FcOption).active = false);
@@ -633,6 +642,7 @@ export class FcSelect extends HTMLElement {
 
         this.hideDropdown();
         this.syncValidity();
+
         this.dispatchEvent(
             new CustomEvent('fc-change', {
                 detail: { value, label },
@@ -665,6 +675,7 @@ export class FcSelect extends HTMLElement {
 		/* calculates available space for dropdown */
 		const spaceBelow = calculateBottomAvaliableSpace(this.inputEl);
 		const spaceAbove = calculateTopAvaliableSpace(this.inputEl);
+
 		dropdown.hidden = false;
 		this.setAttribute('open', 'true');
 		this.inputEl.setAttribute("aria-expanded", "true");
@@ -692,7 +703,6 @@ export class FcSelect extends HTMLElement {
 		}, 0);
 
 		return;
-
 	}
 
 	private hideDropdown() {
