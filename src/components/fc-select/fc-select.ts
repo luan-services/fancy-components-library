@@ -71,7 +71,7 @@ export class FcSelect extends HTMLElement {
         we don't want this behavior, we want 'this' to always be the parent element, <fc-select>, so we add these bindings
         on every function. */
 
-        this.onClick = this.onClick.bind(this);
+        this.onInputClick = this.onInputClick.bind(this);
         this.onChange = this.onChange.bind(this);
         this.onOptionSelect = this.onOptionSelect.bind(this);
         this.onOutsideClick = this.onOutsideClick.bind(this);
@@ -246,7 +246,7 @@ export class FcSelect extends HTMLElement {
         }
 
         /* this functions add a click event listener to the input element for the dropdown to open on any click */
-        this.inputEl.addEventListener('click', this.onClick);
+        this.inputEl.addEventListener('click', this.onInputClick);
 
         /* this functions add an input event listener to the input element, whenever the user leave the field, 'onChange'
         function will be called. */
@@ -320,11 +320,15 @@ export class FcSelect extends HTMLElement {
             this.syncValidity();
         }
     }
+
+	/* this is the cleaning up function, it'll be called when the element is REMOVED from the DOM, here, we want
+	to clean (remove) any event listener that is binded to the DOM. */
     
     disconnectedCallback() {
         document.removeEventListener('click', this.onOutsideClick);
     }
 
+	/* if there is a button type="reset" on the form, and the user clicks it, this function will be run */
     formResetCallback() {
         this._value = '';
         if (this.inputEl) {
@@ -348,6 +352,8 @@ export class FcSelect extends HTMLElement {
         }));
     }
 
+	/* this runs whenever the user click on return on the page and them go back to the form page again,
+	it also runs when the user click on the default browser autocomplete (we disabled it) */
     formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
         const restoredValue = state as string;
 
@@ -374,21 +380,24 @@ export class FcSelect extends HTMLElement {
         };
     }
 
+	/* functions that run on eventListeners */
 
-    private onClick(e: MouseEvent) {
+    private onInputClick(e: MouseEvent) {
         if (this.disabled) {
             return;
         }
         
         if (this.dropdownEl.hidden) {
             this.showDropdown();
-        } else {
-            this.hideDropdown();
-        }
+            return;
+        } 
+
+        this.hideDropdown();
     }
     
     private onChange(e: Event) {
         e.stopPropagation(); 
+        
         this.dispatchEvent(new CustomEvent('fc-change', { 
             detail: { 
                 value: this._value, 
@@ -399,37 +408,43 @@ export class FcSelect extends HTMLElement {
         }));
     }
 
-    private onOptionSelect(e: CustomEvent) {
-        const { value, label } = e.detail; 
+	private onOptionSelect(e: CustomEvent) {
+		const { value, label } = e.detail; // detail are the properties of the custom event from option
 
-        if (this.disabled) {
-            return;
-        }
+		//prevent selecting option if disabled
+		 if (this.disabled) {
+			return;
+		 }
 
-        this.inputEl.value = label; 
-        this._value = value; 
-        this.internals.setFormValue(value); 
+		this.inputEl.value = label; // updates the input text to the option text
+		this._value = value; // updates the value property of <fc-combobox>
+		this.internals.setFormValue(value); // also update the form 'value' property: <fc-combobox value="">
 
+		// get all option elements and makes an array
         const options = this.querySelectorAll('fc-option') as NodeListOf<FcOption>;
 
-        options.forEach((option) => {
-            const selected = (option.value === value); 
-            option.selected = selected 
-            option.active = false; 
+		options.forEach((option) => {
+			const selected = (option.value === value); // checks if the selected option is the current option
+			option.selected = selected // if so, set the option as selected by calling set selected from child fc-option, if not, remove selected attribute(query === label)
+			option.active = false; // now it is needed to remove active status from all options when a option is selected
         });
 
-        this.hideDropdown(); 
-        this.syncValidity();
+		this.hideDropdown(); 
+		this.syncValidity();
 
-        this.dispatchEvent(
-            new CustomEvent('fc-change', {
-                detail: { value, label },
-                bubbles: true,
-                composed: true,
-            })
-        );
-    }
+        this.inputEl.focus(); // prevents focus loss when clicking on an option
 
+
+		this.dispatchEvent( // dispatch a new event for anything outside listen saying that the values are changed (to work with frameworks)
+			new CustomEvent('fc-change', {
+				detail: { value, label },
+				bubbles: true,
+				composed: true,
+			})
+		);
+	}
+
+    /* onOutsideClick is a function binded to an eventlistener that lives only inside show/hide Dropdown */
     private onOutsideClick(e: MouseEvent) { 
         if (!this.contains(e.target as Node)) {
             this.hideDropdown();
@@ -445,7 +460,9 @@ export class FcSelect extends HTMLElement {
     };
 
     private onSlotChange() {
-        if (!this._value) return;
+        if (!this._value) {
+            return;
+        }
 
         const options = this.querySelectorAll('fc-option') as NodeListOf<FcOption>;
         let foundMatch = false;
@@ -468,13 +485,18 @@ export class FcSelect extends HTMLElement {
     };
 
     private onKeyDown(e: KeyboardEvent) {
-        
+        /* if this element is disabled, return */
         if (this.disabled) {
             return;
         }
 
-        const options = this.getVisibleOptions();
-        if (options.length === 0) return;
+        const options = Array.from(this.querySelectorAll('fc-option')).filter(
+            opt => !(opt as FcOption).disabled
+        ) as FcOption[];
+
+        if (options.length === 0) {
+            return;
+        }
 
         if (e.key === 'ArrowDown') {
             e.preventDefault(); 
@@ -528,6 +550,8 @@ export class FcSelect extends HTMLElement {
         }
     }
 
+    /* helper functions */
+
     private handleTypeAhead(char: string) {
         if (this.searchTimeout) clearTimeout(this.searchTimeout);
 
@@ -537,7 +561,9 @@ export class FcSelect extends HTMLElement {
             this.searchBuffer = '';
         }, 500);
 
-        const options = this.getVisibleOptions();
+        const options = Array.from(this.querySelectorAll('fc-option')).filter(
+            opt => !(opt as FcOption).disabled
+        ) as FcOption[];
         
         const matchIndex = options.findIndex(opt => {
             const label = (opt.getAttribute('label') || opt.textContent || '').toLowerCase();
@@ -563,10 +589,11 @@ export class FcSelect extends HTMLElement {
     private onInvalid(e: Event) {
         this.setAttribute('touched', '');
         
-		/* when onInvalid runs it is because internal input launched an invalid event. this event dies on the component, it is a formInternals
-		event that is launched by the BROWSER and it does not bubble up, parents components like a form, cannot hear it
-		we are re-dispatching an fc-invalid event so the user can listen to invalid events not just on <fc-combobox> but on any element 
-		wrapping it */
+		/* when onInvalid runs it is because internal input launched an invalid event. this event dies on the component, it is a 
+        formInternals event that is launched by the BROWSER and it does not bubble up, parents components like a form, cannot hear it
+
+		we are re-dispatching an fc-invalid event so the user can listen to invalid events not just on <fc-combobox> but on any 
+        element wrapping it */
 		this.dispatchEvent(new CustomEvent('fc-invalid', {
 			bubbles: true,  
 			composed: true, 
@@ -587,12 +614,6 @@ export class FcSelect extends HTMLElement {
             return;
         }
         this.inputEl.removeAttribute('aria-activedescendant');
-    }
-
-    private getVisibleOptions(): FcOption[] {
-        
-        return Array.from(this.querySelectorAll('fc-option')).filter(
-            opt => !(opt as FcOption).disabled) as FcOption[];
     }
 
     private selectOption(option: FcOption) {
@@ -627,7 +648,7 @@ export class FcSelect extends HTMLElement {
 
 		const dropdown = this.dropdownEl;
 
-		/*custom event dispatch when dropdown is open (for developer experience) */
+		/* custom event dispatch when dropdown is open (for developer experience) */
 		const showEvent = new CustomEvent('fc-show', {
 			bubbles: true,
 			composed: true,
@@ -653,7 +674,9 @@ export class FcSelect extends HTMLElement {
 		dropdown.classList.toggle('opens-up', shouldOpenUp);
 
         // Scroll to currently selected option
-        const options = this.getVisibleOptions();
+        const options = Array.from(this.querySelectorAll('fc-option')).filter(
+            opt => !(opt as FcOption).disabled
+        ) as FcOption[];
         const selectedIndex = options.findIndex(opt => opt.value === this._value);
         
         if (selectedIndex >= 0) {

@@ -184,7 +184,8 @@ export class FcCombobox extends HTMLElement {
 		this.onOptionSelect = this.onOptionSelect.bind(this);
 		this.onOutsideClick = this.onOutsideClick.bind(this);
 		this.onFocusOut = this.onFocusOut.bind(this);
-		this.onFocus = this.onFocus.bind(this);
+
+		this.onInputClick = this.onInputClick.bind(this);
 
 		/* exclusive function for react see below */
 		this.onSlotChange = this.onSlotChange.bind(this);
@@ -441,7 +442,7 @@ export class FcCombobox extends HTMLElement {
 		this.addEventListener('focusout', this.onFocusOut as EventListener);
 
 		/* this listener is for when the user clicks on the input again (and it already had text) */
-		this.inputEl.addEventListener('focus', this.onFocus);
+		this.inputEl.addEventListener('click', this.onInputClick);
 
 		this.inputEl.addEventListener('blur', this.onBlur);
 
@@ -723,8 +724,11 @@ export class FcCombobox extends HTMLElement {
 			option.active = false; // now it is needed to remove active status from all options when a option is selected
         });
 
-		this.hideDropdown(); // close dropdown
+		this.hideDropdown();
 		this.syncValidity();
+
+		this.inputEl.focus(); // prevents focus loss when clicking on an option
+
 		this.dispatchEvent( // dispatch a new event for anything outside listen saying that the values are changed (to work with frameworks)
 			new CustomEvent('fc-change', {
 				detail: { value, label },
@@ -748,7 +752,7 @@ export class FcCombobox extends HTMLElement {
 		}
 	};
 
-	private onFocus(e: FocusEvent) {
+	private onInputClick(e: FocusEvent) {
 		// do not open if disabled
 		if (this.disabled) {
 			return;

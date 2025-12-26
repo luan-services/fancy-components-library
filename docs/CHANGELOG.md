@@ -49,7 +49,8 @@
 
 - Added missing CSS styles for errors on <fc-select>
 
-### Version 1.3.4 (Bug Fix)
+### Version 1.3.4
 
 - Updated comments on <fc-select>.
-
+- Removed onFocus listener from <fc-combobox> and switched to onClick for better UX.
+- Updated onOptionSelect to prevent element focus loss when clicking on an option.
