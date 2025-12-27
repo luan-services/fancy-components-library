@@ -42,7 +42,7 @@ export class FcOption extends HTMLElement {
 	}
 
 	public get label() { // label is the inner text that are shown on the option element, 'value' is the hidden value
-		return this.getAttribute('label') ?? this.textContent ?? '';
+		return this.getAttribute('label') ?? this.textContent?.trim() ?? '';
 	}
 
 	public set label(val: string) {

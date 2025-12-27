@@ -55,6 +55,11 @@ export const styles = `
 		height: var(--fc-option-icon-height);
     }
 
+	slot[name="checked-icon"]::slotted(*) {
+		width: var(--fc-option-icon-width);
+		height: var(--fc-option-icon-height);
+	}
+
 	button.fc-option:hover {
 		background: var(--fc-option-bg-hover);
 		transition: background 0.15s ease-in-out, color 0.15s ease-in-out;
